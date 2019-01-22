@@ -9,20 +9,18 @@ const (
 	IDENT = "IDENT"
 	INT   = "INT"
 
-	ASSIGN = "ASSIGN"
-	PLUS   = "PLUS"
+	ASSIGN = "="
+	PLUS   = "+"
+	MINUS  = "-"
+	ASTER  = "*"
+	SLASH  = "/"
 
 	COMMA     = ","
 	SEMICOLON = ";"
 
 	LPAREN   = "("
 	RPAREN   = ")"
-	LBRACE   = "{"
-	RBRACE   = "}"
-	LBRACKET = "["
-	RBRACKET = "]"
 
-	FN     = "FN"
 	LET    = "LET"
 	RETURN = "RETURN"
 )

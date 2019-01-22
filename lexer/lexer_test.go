@@ -12,9 +12,25 @@ func TestLexer_NextToken(t *testing.T) {
 		expectedTokens []token.Token
 	}{
 		{
-			desc:  "empty input",
+			desc:  "empty",
 			input: "",
 			expectedTokens: []token.Token{
+				{Type: token.EOF, Literal: "", Line: 1},
+			},
+		},
+		{
+			desc:  "one-char operators",
+			input: "=+-*/(),;",
+			expectedTokens: []token.Token{
+				{Type: token.ASSIGN, Literal: "=", Line: 1},
+				{Type: token.PLUS, Literal: "+", Line: 1},
+				{Type: token.MINUS, Literal: "-", Line: 1},
+				{Type: token.ASTER, Literal: "*", Line: 1},
+				{Type: token.SLASH, Literal: "/", Line: 1},
+				{Type: token.LPAREN, Literal: "(", Line: 1},
+				{Type: token.RPAREN, Literal: ")", Line: 1},
+				{Type: token.COMMA, Literal: ",", Line: 1},
+				{Type: token.SEMICOLON, Literal: ";", Line: 1},
 				{Type: token.EOF, Literal: "", Line: 1},
 			},
 		},
@@ -27,7 +43,7 @@ func TestLexer_NextToken(t *testing.T) {
 			for _, expected := range tt.expectedTokens {
 				actual := lexer.NextToken()
 				if actual != expected {
-					t.Errorf("wrong token. \nwant:%+v\ngot:%+v\n", actual, expected)
+					t.Errorf("wrong token. \nwant:%+v\ngot:%+v\n", expected, actual)
 				}
 			}
 		})

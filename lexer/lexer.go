@@ -16,6 +16,7 @@ type Lexer struct {
 func New(input string) *Lexer {
 	lexer := &Lexer{input: input, currentLine: 1}
 	lexer.sanitizeInput()
+	lexer.consumeChar()
 
 	return lexer
 }
@@ -25,7 +26,24 @@ func (l *Lexer) NextToken() token.Token {
 
 	var tok token.Token
 	switch l.ch {
-	// TODO: lex one char tokens
+	case '=':
+		tok = token.Token{Type: token.ASSIGN, Literal: "=", Line: l.currentLine}
+	case '+':
+		tok = token.Token{Type: token.PLUS, Literal: "+", Line: l.currentLine}
+	case '-':
+		tok = token.Token{Type: token.MINUS, Literal: "-", Line: l.currentLine}
+	case '*':
+		tok = token.Token{Type: token.ASTER, Literal: "*", Line: l.currentLine}
+	case '/':
+		tok = token.Token{Type: token.SLASH, Literal: "/", Line: l.currentLine}
+	case '(':
+		tok = token.Token{Type: token.LPAREN, Literal: "(", Line: l.currentLine}
+	case ')':
+		tok = token.Token{Type: token.RPAREN, Literal: ")", Line: l.currentLine}
+	case ',':
+		tok = token.Token{Type: token.COMMA, Literal: ",", Line: l.currentLine}
+	case ';':
+		tok = token.Token{Type: token.SEMICOLON, Literal: ";", Line: l.currentLine}
 	case 0:
 		tok = token.Token{Type: token.EOF, Literal: "", Line: l.currentLine}
 	default:
