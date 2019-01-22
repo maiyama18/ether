@@ -47,7 +47,15 @@ func (l *Lexer) NextToken() token.Token {
 	case 0:
 		tok = token.Token{Type: token.EOF, Literal: "", Line: l.currentLine}
 	default:
-		tok = token.Token{Type: token.ILLEGAL, Literal: string(l.ch), Line: l.currentLine}
+		if isLetter(l.ch) {
+			literal := l.readName()
+			tok = token.Token{Type: token.TypeByLiteral(literal), Literal: literal, Line: l.currentLine}
+		} else if isDigit(l.ch) {
+			literal := l.readInteger()
+			tok = token.Token{Type: token.INTEGER, Literal: literal, Line: l.currentLine}
+		} else {
+			tok = token.Token{Type: token.ILLEGAL, Literal: string(l.ch), Line: l.currentLine}
+		}
 	}
 
 	l.consumeChar()
@@ -73,8 +81,47 @@ func (l *Lexer) consumeChar() {
 	l.peekPosition++
 }
 
+func (l *Lexer) peekChar() byte {
+	if l.peekPosition >= len(l.input) {
+		return 0
+	}
+	return l.input[l.peekPosition]
+}
+
+func (l *Lexer) readName() string {
+	start := l.currentPosition
+	for {
+		l.consumeChar()
+		if pc := l.peekChar(); !isLetter(pc) && !isDigit(pc) {
+			break
+		}
+	}
+
+	return l.input[start : l.currentPosition+1]
+}
+
+func (l *Lexer) readInteger() string {
+	start := l.currentPosition
+	for {
+		l.consumeChar()
+		if pc := l.peekChar(); !isDigit(pc) {
+			break
+		}
+	}
+
+	return l.input[start : l.currentPosition+1]
+}
+
 func (l *Lexer) skipSpaces() {
 	for l.ch == ' ' || l.ch == '\n' {
 		l.consumeChar()
 	}
+}
+
+func isDigit(c byte) bool {
+	return '0' < c && c < '9'
+}
+
+func isLetter(c byte) bool {
+	return ('a' < c && c < 'z') || ('A' < c && c < 'Z') || c == '_'
 }

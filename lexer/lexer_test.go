@@ -48,6 +48,18 @@ func TestLexer_NextToken(t *testing.T) {
 				{Type: token.EOF, Literal: "", Line: 3},
 			},
 		},
+		{
+			desc:  "multi-char tokens",
+			input: "let foo = 42;",
+			expectedTokens: []token.Token{
+				{Type: token.LET, Literal: "let", Line: 1},
+				{Type: token.IDENT, Literal: "foo", Line: 1},
+				{Type: token.ASSIGN, Literal: "=", Line: 1},
+				{Type: token.INTEGER, Literal: "42", Line: 1},
+				{Type: token.SEMICOLON, Literal: ";", Line: 1},
+				{Type: token.EOF, Literal: "", Line: 1},
+			},
+		},
 	}
 
 	for _, tt := range tests {

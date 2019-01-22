@@ -6,8 +6,8 @@ const (
 	ILLEGAL = "ILLEGAL"
 	EOF     = "EOF"
 
-	IDENT = "IDENT"
-	INT   = "INT"
+	IDENT   = "IDENT"
+	INTEGER = "INTEGER"
 
 	ASSIGN = "="
 	PLUS   = "+"
@@ -18,8 +18,8 @@ const (
 	COMMA     = ","
 	SEMICOLON = ";"
 
-	LPAREN   = "("
-	RPAREN   = ")"
+	LPAREN = "("
+	RPAREN = ")"
 
 	LET    = "LET"
 	RETURN = "RETURN"
@@ -29,4 +29,15 @@ type Token struct {
 	Type    Type
 	Literal string
 	Line    int
+}
+
+func TypeByLiteral(literal string) Type {
+	switch literal {
+	case "let":
+		return LET
+	case "return":
+		return RETURN
+	default:
+		return IDENT
+	}
 }
