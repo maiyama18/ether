@@ -17,11 +17,11 @@ func TestParser_ParseProgram_LetStatement(t *testing.T) {
 			input:        "let a = 5;",
 			expectedName: "a",
 		},
-		// {
-		// 	desc:         "multiple-char identifier",
-		// 	input:        "let foo = 42;",
-		// 	expectedName: "foo",
-		// },
+		{
+			desc:         "multiple-char identifier",
+			input:        "let foo = 42;",
+			expectedName: "foo",
+		},
 	}
 
 	for _, tt := range tests {
