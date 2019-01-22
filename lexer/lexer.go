@@ -25,6 +25,7 @@ func (l *Lexer) NextToken() token.Token {
 
 	var tok token.Token
 	switch l.ch {
+	// TODO: lex one char tokens
 	case 0:
 		tok = token.Token{Type: token.EOF, Literal: "", Line: l.currentLine}
 	default:
