@@ -34,6 +34,20 @@ func TestLexer_NextToken(t *testing.T) {
 				{Type: token.EOF, Literal: "", Line: 1},
 			},
 		},
+		{
+			desc: "multiple-line input",
+			input: `=
++-
+*/`,
+			expectedTokens: []token.Token{
+				{Type: token.ASSIGN, Literal: "=", Line: 1},
+				{Type: token.PLUS, Literal: "+", Line: 2},
+				{Type: token.MINUS, Literal: "-", Line: 2},
+				{Type: token.ASTER, Literal: "*", Line: 3},
+				{Type: token.SLASH, Literal: "/", Line: 3},
+				{Type: token.EOF, Literal: "", Line: 3},
+			},
+		},
 	}
 
 	for _, tt := range tests {
