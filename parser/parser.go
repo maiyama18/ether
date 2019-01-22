@@ -95,6 +95,7 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 	return &ast.ExpressionStatement{Expression: expression}
 }
 
+// TODO: add precedence and parse infix expression
 func (p *Parser) parseExpression() ast.Expression {
 	var left ast.Expression
 	switch p.currentToken.Type {
