@@ -32,5 +32,8 @@ type ReturnStatement struct {
 	Expression Expression
 }
 
+func NewReturnStatement(token token.Token, expression Expression) *ReturnStatement {
+	return &ReturnStatement{token: token, Expression: expression}
+}
 func (rs *ReturnStatement) Token() token.Token { return rs.token }
 func (rs *ReturnStatement) StatementNode()     {}
