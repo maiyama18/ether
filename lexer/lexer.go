@@ -16,6 +16,7 @@ type Lexer struct {
 
 func NewLexer(input string) *Lexer {
 	lexer := &Lexer{input: input}
+	lexer.sanitizeInput()
 
 	return lexer
 }
@@ -44,6 +45,14 @@ func (l *Lexer) consumeChar() {
 }
 
 func (l *Lexer) skipSpaces() {
+	for l.ch == ' ' || l.ch == '\n' {
+		switch l.ch {
+		case ' ':
+
+		case '\n':
+
+		}
+	}
 	if l.ch == ' ' || l.ch == '\t' || l.ch == '\r' {
 		l.consumeChar()
 	}
