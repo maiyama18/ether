@@ -92,7 +92,7 @@ func (l *Lexer) readName() string {
 	start := l.currentPosition
 	for {
 		l.consumeChar()
-		if pc := l.peekChar(); !isLetter(pc) && !isDigit(pc) {
+		if pC := l.peekChar(); !isLetter(pC) && !isDigit(pC) {
 			break
 		}
 	}
