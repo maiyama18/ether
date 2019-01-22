@@ -30,4 +30,5 @@ const (
 type Token struct {
 	Type    Type
 	Literal string
+	Line    int
 }
