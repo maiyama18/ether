@@ -64,10 +64,9 @@ func (p *Parser) parseStatement() ast.Statement {
 }
 
 func (p *Parser) parseLetStatement() *ast.LetStatement {
-	tok := p.currentToken
 	p.consumeToken()
 
-	identifier := ast.NewIdentifier(p.currentToken)
+	identifier := &ast.Identifier{Name: p.currentToken.Literal}
 
 	p.expectToken(token.ASSIGN)
 
@@ -76,11 +75,10 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 		p.consumeToken()
 	}
 
-	return ast.NewLetStatement(tok, identifier, nil)
+	return &ast.LetStatement{Identifier: identifier, Expression: nil}
 }
 
 func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
-	tok := p.currentToken
 	p.consumeToken()
 
 	// TODO: parse expression
@@ -88,5 +86,5 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 		p.consumeToken()
 	}
 
-	return ast.NewReturnStatement(tok, nil)
+	return &ast.ReturnStatement{Expression: nil}
 }

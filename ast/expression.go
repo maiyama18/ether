@@ -1,7 +1,6 @@
 package ast
 
 import (
-	"github.com/muiscript/ether/token"
 	"strconv"
 )
 
@@ -11,24 +10,17 @@ type Expression interface {
 }
 
 type Identifier struct {
-	token token.Token
-	Name  string
+	Name string
 }
 
-func NewIdentifier(token token.Token) *Identifier {
-	return &Identifier{token: token, Name: token.Literal}
-}
-func (i *Identifier) Token() token.Token { return i.token }
-func (i *Identifier) ExpressionNode()    {}
+func (i *Identifier) String() string  { return i.Name }
+func (i *Identifier) ExpressionNode() {}
 
 type IntegerLiteral struct {
-	token token.Token
 	Value int
 }
 
-func NewIntegerLiteral(token token.Token) *IntegerLiteral {
-	value, _ := strconv.Atoi(token.Literal)
-	return &IntegerLiteral{token: token, Value: value}
+func (il *IntegerLiteral) String() string {
+	return strconv.Itoa(il.Value)
 }
-func (il *IntegerLiteral) Token() token.Token { return il.token }
-func (il *IntegerLiteral) ExpressionNode()    {}
+func (il *IntegerLiteral) ExpressionNode() {}

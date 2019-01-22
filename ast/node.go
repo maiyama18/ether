@@ -1,18 +1,21 @@
 package ast
 
-import "github.com/muiscript/ether/token"
+import (
+	"bytes"
+)
 
 type Node interface {
-	Token() token.Token
+	String() string
 }
 
 type Program struct {
 	Statements []Statement
 }
 
-func (p *Program) Token() token.Token {
-	if len(p.Statements) == 0 {
-		return token.Token{Type: token.EOF, Literal: "", Line: 1}
+func (p *Program) String() string {
+	var out bytes.Buffer
+	for _, statement := range p.Statements {
+		out.WriteString(statement.String())
 	}
-	return p.Statements[0].Token()
+	return out.String()
 }
