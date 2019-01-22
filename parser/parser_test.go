@@ -99,13 +99,45 @@ func TestParser_ParseProgram_IntegerLiteral(t *testing.T) {
 			program := parseProgram(tt.input)
 			expression := convertProgramToSingleExpression(t, program)
 
-			integerLiteral, ok := expression.(*ast.IntegerLiteral)
+			testLiteral(t, tt.expected, expression)
+		})
+	}
+}
+
+func TestParser_ParseProgram_PrefixExpression(t *testing.T) {
+	tests := []struct {
+		desc             string
+		input            string
+		expectedOperator string
+		expectedRight    int
+	}{
+		{
+			desc:             "-5",
+			input:            "-5;",
+			expectedOperator: "-",
+			expectedRight:    5,
+		},
+		{
+			desc:             "-42",
+			input:            "-42;",
+			expectedOperator: "-",
+			expectedRight:    42,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			program := parseProgram(tt.input)
+			expression := convertProgramToSingleExpression(t, program)
+
+			prefixExpression, ok := expression.(*ast.PrefixExpression)
 			if !ok {
-				t.Errorf("statement type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.IntegerLiteral{}, integerLiteral, integerLiteral)
+				t.Errorf("statement type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.PrefixExpression{}, prefixExpression, prefixExpression)
 			}
-			if integerLiteral.Value != tt.expected {
-				t.Errorf("integer value wrong.\nwant=%+v\ngot=%+v\n", tt.expected, integerLiteral.Value)
+			if prefixExpression.Operator != tt.expectedOperator {
+				t.Errorf("operator wrong.\nwant=%+v\ngot=%+v\n", tt.expectedOperator, prefixExpression.Operator)
 			}
+			testLiteral(t, tt.expectedRight, prefixExpression.Right)
 		})
 	}
 }
@@ -128,4 +160,19 @@ func convertProgramToSingleExpression(t *testing.T, program *ast.Program) ast.Ex
 		t.Errorf("statement type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.ExpressionStatement{}, expressionStatement, expressionStatement)
 	}
 	return expressionStatement.Expression
+}
+
+func testLiteral(t *testing.T, expected interface{}, expression ast.Expression) {
+	t.Helper()
+
+	switch expected := expected.(type) {
+	case int:
+		integerLiteral, ok := expression.(*ast.IntegerLiteral)
+		if !ok {
+			t.Errorf("expression type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.IntegerLiteral{}, integerLiteral, integerLiteral)
+		}
+		if expected != integerLiteral.Value {
+			t.Errorf("integer value wrong.\nwant=%+v\ngot=%+v\n", expected, integerLiteral.Value)
+		}
+	}
 }

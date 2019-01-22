@@ -24,3 +24,13 @@ func (il *IntegerLiteral) String() string {
 	return strconv.Itoa(il.Value)
 }
 func (il *IntegerLiteral) ExpressionNode() {}
+
+type PrefixExpression struct {
+	Operator string
+	Right    Expression
+}
+
+func (pe *PrefixExpression) String() string {
+	return "(" + pe.Operator + pe.Right.String() + ")"
+}
+func (pe *PrefixExpression) ExpressionNode() {}

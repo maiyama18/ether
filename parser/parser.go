@@ -100,6 +100,8 @@ func (p *Parser) parseExpression() ast.Expression {
 	switch p.currentToken.Type {
 	case token.INTEGER:
 		left = p.parseInteger()
+	case token.MINUS:
+		left = p.parsePrefixExpression()
 	}
 
 	if p.peekToken.Type == token.SEMICOLON {
@@ -109,7 +111,14 @@ func (p *Parser) parseExpression() ast.Expression {
 	return left
 }
 
-func (p *Parser) parseInteger() ast.Expression {
+func (p *Parser) parseInteger() *ast.IntegerLiteral {
 	v, _ := strconv.Atoi(p.currentToken.Literal)
 	return &ast.IntegerLiteral{Value: v}
+}
+
+func (p *Parser) parsePrefixExpression() *ast.PrefixExpression {
+	operator := p.currentToken.Literal
+	p.consumeToken()
+	right := p.parseExpression()
+	return &ast.PrefixExpression{Operator: operator, Right: right}
 }
