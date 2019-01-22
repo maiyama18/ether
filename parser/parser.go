@@ -69,6 +69,7 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 
 	p.expectToken(token.ASSIGN)
 
+	// TODO: parse expression
 	for p.currentToken.Type != token.SEMICOLON {
 		p.consumeToken()
 	}

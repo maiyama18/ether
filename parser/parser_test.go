@@ -42,6 +42,40 @@ func TestParser_ParseProgram_LetStatement(t *testing.T) {
 	}
 }
 
+func TestParser_ParseProgram_ReturnStatement(t *testing.T) {
+	tests := []struct {
+		desc  string
+		input string
+	}{
+		{
+			desc:  "simple",
+			input: "return a;",
+		},
+		{
+			desc:  "multiple-char identifier",
+			input: "return foo;",
+		},
+		{
+			desc:  "integer literal",
+			input: "return 42;",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			program := parseProgram(tt.input)
+
+			if len(program.Statements) != 1 {
+				t.Errorf("statements length wrong.\nwant=%d\ngot=%d\n", 1, len(program.Statements))
+			}
+			returnStatement, ok := program.Statements[0].(*ast.ReturnStatement)
+			if !ok {
+				t.Errorf("statement type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.ReturnStatement{}, returnStatement, returnStatement)
+			}
+		})
+	}
+}
+
 func parseProgram(input string) *ast.Program {
 	lexer := lexer.New(input)
 	parser := New(lexer)
