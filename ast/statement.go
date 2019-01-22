@@ -26,5 +26,5 @@ type ExpressionStatement struct {
 	Expression Expression
 }
 
-func (es *ExpressionStatement) String() string { return es.String() }
+func (es *ExpressionStatement) String() string { return es.Expression.String() }
 func (es *ExpressionStatement) StatementNode() {}

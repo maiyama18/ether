@@ -5,6 +5,7 @@ import (
 	"github.com/muiscript/ether/ast"
 	"github.com/muiscript/ether/lexer"
 	"github.com/muiscript/ether/token"
+	"strconv"
 )
 
 type Parser struct {
@@ -59,7 +60,7 @@ func (p *Parser) parseStatement() ast.Statement {
 	case token.RETURN:
 		return p.parseReturnStatement()
 	default:
-		return nil
+		return p.parseExpressionStatement()
 	}
 }
 
@@ -87,4 +88,28 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	}
 
 	return &ast.ReturnStatement{Expression: nil}
+}
+
+func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
+	expression := p.parseExpression()
+	return &ast.ExpressionStatement{Expression: expression}
+}
+
+func (p *Parser) parseExpression() ast.Expression {
+	var left ast.Expression
+	switch p.currentToken.Type {
+	case token.INTEGER:
+		left = p.parseInteger()
+	}
+
+	if p.peekToken.Type == token.SEMICOLON {
+		p.consumeToken()
+	}
+
+	return left
+}
+
+func (p *Parser) parseInteger() ast.Expression {
+	v, _ := strconv.Atoi(p.currentToken.Literal)
+	return &ast.IntegerLiteral{Value: v}
 }
