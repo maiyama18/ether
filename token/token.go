@@ -4,30 +4,30 @@ type Type string
 
 const (
 	ILLEGAL = "ILLEGAL"
-	EOF = "EOF"
+	EOF     = "EOF"
 
 	IDENT = "IDENT"
-	INT = "INT"
+	INT   = "INT"
 
 	ASSIGN = "ASSIGN"
-	PLUS = "PLUS"
+	PLUS   = "PLUS"
 
-	COMMA = ","
+	COMMA     = ","
 	SEMICOLON = ";"
 
-	LPAREN = "("
-	RPAREN = ")"
-	LBRACE = "{"
-	RBRACE = "}"
+	LPAREN   = "("
+	RPAREN   = ")"
+	LBRACE   = "{"
+	RBRACE   = "}"
 	LBRACKET = "["
 	RBRACKET = "]"
 
-	FN = "FN"
-	LET = "LET"
+	FN     = "FN"
+	LET    = "LET"
 	RETURN = "RETURN"
 )
 
 type Token struct {
-	Type Type
+	Type    Type
 	Literal string
 }
