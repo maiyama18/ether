@@ -13,6 +13,9 @@ type LetStatement struct {
 	Expression Expression
 }
 
+func NewLetStatement(token token.Token, identifier *Identifier, expression Expression) *LetStatement {
+	return &LetStatement{token: token, Identifier: identifier, Expression: expression}
+}
 func (ls *LetStatement) Token() token.Token { return ls.token }
 func (ls *LetStatement) StatementNode()     {}
 

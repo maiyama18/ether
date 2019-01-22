@@ -2,7 +2,6 @@ package lexer
 
 import (
 	"github.com/muiscript/ether/token"
-	"strings"
 )
 
 type Lexer struct {
@@ -15,7 +14,6 @@ type Lexer struct {
 
 func New(input string) *Lexer {
 	lexer := &Lexer{input: input, currentLine: 1}
-	lexer.sanitizeInput()
 	lexer.consumeChar()
 
 	return lexer
@@ -62,12 +60,6 @@ func (l *Lexer) NextToken() token.Token {
 	return tok
 }
 
-func (l *Lexer) sanitizeInput() {
-	sanitized := strings.Replace(l.input, "\t", " ", -1)
-	sanitized = strings.Replace(sanitized, "\r", " ", -1)
-	l.input = sanitized
-}
-
 func (l *Lexer) consumeChar() {
 	if l.peekPosition >= len(l.input) {
 		l.ch = 0
@@ -91,10 +83,10 @@ func (l *Lexer) peekChar() byte {
 func (l *Lexer) readName() string {
 	start := l.currentPosition
 	for {
-		l.consumeChar()
 		if pC := l.peekChar(); !isLetter(pC) && !isDigit(pC) {
 			break
 		}
+		l.consumeChar()
 	}
 
 	return l.input[start : l.currentPosition+1]
@@ -103,25 +95,25 @@ func (l *Lexer) readName() string {
 func (l *Lexer) readInteger() string {
 	start := l.currentPosition
 	for {
-		l.consumeChar()
 		if pc := l.peekChar(); !isDigit(pc) {
 			break
 		}
+		l.consumeChar()
 	}
 
 	return l.input[start : l.currentPosition+1]
 }
 
 func (l *Lexer) skipSpaces() {
-	for l.ch == ' ' || l.ch == '\n' {
+	for l.ch == ' ' || l.ch == '\t' || l.ch == '\r' || l.ch == '\n' {
 		l.consumeChar()
 	}
 }
 
 func isDigit(c byte) bool {
-	return '0' < c && c < '9'
+	return '0' <= c && c <= '9'
 }
 
 func isLetter(c byte) bool {
-	return ('a' < c && c < 'z') || ('A' < c && c < 'Z') || c == '_'
+	return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_'
 }

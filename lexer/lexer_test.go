@@ -19,7 +19,7 @@ func TestLexer_NextToken(t *testing.T) {
 			},
 		},
 		{
-			desc:  "one-char operators",
+			desc:  "single-char operators",
 			input: "=+-*/(),;",
 			expectedTokens: []token.Token{
 				{Type: token.ASSIGN, Literal: "=", Line: 1},
@@ -49,7 +49,24 @@ func TestLexer_NextToken(t *testing.T) {
 			},
 		},
 		{
-			desc: "keywords and literals",
+			desc: "single-char keywords and literals",
+			input: `let a = 5;
+return a;`,
+			expectedTokens: []token.Token{
+				{Type: token.LET, Literal: "let", Line: 1},
+				{Type: token.IDENT, Literal: "a", Line: 1},
+				{Type: token.ASSIGN, Literal: "=", Line: 1},
+				{Type: token.INTEGER, Literal: "5", Line: 1},
+				{Type: token.SEMICOLON, Literal: ";", Line: 1},
+
+				{Type: token.RETURN, Literal: "return", Line: 2},
+				{Type: token.IDENT, Literal: "a", Line: 2},
+				{Type: token.SEMICOLON, Literal: ";", Line: 2},
+				{Type: token.EOF, Literal: "", Line: 2},
+			},
+		},
+		{
+			desc: "multichar keywords and literals",
 			input: `let foo = 42;
 return foo;`,
 			expectedTokens: []token.Token{
