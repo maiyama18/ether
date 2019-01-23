@@ -9,17 +9,17 @@ const (
 	IDENT   = "IDENT"
 	INTEGER = "INTEGER"
 
-	ASSIGN = "="
-	PLUS   = "+"
-	MINUS  = "-"
-	ASTER  = "*"
-	SLASH  = "/"
+	ASSIGN = "ASSIGN"
+	PLUS   = "PLUS"
+	MINUS  = "MINUS"
+	ASTER  = "ASTER"
+	SLASH  = "SLASH"
 
-	COMMA     = ","
-	SEMICOLON = ";"
+	COMMA     = "COMMA"
+	SEMICOLON = "SEMICOLON"
 
-	LPAREN = "("
-	RPAREN = ")"
+	LPAREN = "LPAREN"
+	RPAREN = "RPAREN"
 
 	VAR    = "VAR"
 	RETURN = "RETURN"
