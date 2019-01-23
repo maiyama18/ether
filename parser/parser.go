@@ -130,6 +130,8 @@ func (p *Parser) parseExpression(precedence Precedence) ast.Expression {
 	switch p.currentToken.Type {
 	case token.INTEGER:
 		left = p.parseInteger()
+	case token.IDENT:
+		left = p.parseIdentifier()
 	case token.MINUS:
 		left = p.parsePrefixExpression()
 	}
@@ -145,6 +147,10 @@ func (p *Parser) parseExpression(precedence Precedence) ast.Expression {
 func (p *Parser) parseInteger() *ast.IntegerLiteral {
 	v, _ := strconv.Atoi(p.currentToken.Literal)
 	return &ast.IntegerLiteral{Value: v}
+}
+
+func (p *Parser) parseIdentifier() *ast.Identifier {
+	return &ast.Identifier{Name: p.currentToken.Literal}
 }
 
 func (p *Parser) parsePrefixExpression() *ast.PrefixExpression {

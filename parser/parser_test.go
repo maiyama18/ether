@@ -6,21 +6,30 @@ import (
 	"testing"
 )
 
-func TestParser_ParseProgram_LetStatement(t *testing.T) {
+func TestParser_ParseProgram_VarStatement(t *testing.T) {
 	tests := []struct {
-		desc         string
-		input        string
-		expectedName string
+		desc               string
+		input              string
+		expectedName       string
+		expectedExpression interface{}
 	}{
 		{
-			desc:         "simple",
-			input:        "var a = 5;",
-			expectedName: "a",
+			desc:               "var a = 5",
+			input:              "var a = 5;",
+			expectedName:       "a",
+			expectedExpression: 5,
 		},
 		{
-			desc:         "multiple-char identifier",
-			input:        "var foo = 42;",
-			expectedName: "foo",
+			desc:               "var foo = 42",
+			input:              "var foo = 42;",
+			expectedName:       "foo",
+			expectedExpression: 42,
+		},
+		{
+			desc:               "var foo = bar",
+			input:              "var foo = bar;",
+			expectedName:       "foo",
+			expectedExpression: "bar",
 		},
 	}
 
@@ -91,6 +100,34 @@ func TestParser_ParseProgram_IntegerLiteral(t *testing.T) {
 			desc:     "42",
 			input:    "42;",
 			expected: 42,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			program := parseProgram(tt.input)
+			expression := convertProgramToSingleExpression(t, program)
+
+			testLiteral(t, tt.expected, expression)
+		})
+	}
+}
+
+func TestParser_ParseProgram_Identifier(t *testing.T) {
+	tests := []struct {
+		desc     string
+		input    string
+		expected string
+	}{
+		{
+			desc:     "a",
+			input:    "a;",
+			expected: "a",
+		},
+		{
+			desc:     "foo",
+			input:    "foo;",
+			expected: "foo",
 		},
 	}
 
@@ -225,6 +262,14 @@ func testLiteral(t *testing.T, expected interface{}, expression ast.Expression) 
 		}
 		if expected != integerLiteral.Value {
 			t.Errorf("integer value wrong.\nwant=%+v\ngot=%+v\n", expected, integerLiteral.Value)
+		}
+	case string:
+		identifier, ok := expression.(*ast.Identifier)
+		if !ok {
+			t.Errorf("expression type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.Identifier{}, identifier, identifier)
+		}
+		if expected != identifier.Name {
+			t.Errorf("identifier name wrong.\nwant=%+v\ngot=%+v\n", expected, identifier.Name)
 		}
 	}
 }
