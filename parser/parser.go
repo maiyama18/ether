@@ -131,6 +131,10 @@ func (p *Parser) parseExpression(precedence Precedence) ast.Expression {
 		left = p.parseIdentifier()
 	case token.MINUS:
 		left = p.parsePrefixExpression()
+	case token.LPAREN:
+		left = p.parseGroupedExpression()
+	default:
+		p.addParserError(p.currentToken.Line, fmt.Sprintf("unable to parse token %+v\n", p.currentToken))
 	}
 
 	for precedence < p.peekPrecedence() {
@@ -163,4 +167,12 @@ func (p *Parser) parseInfixExpression(left ast.Expression) *ast.InfixExpression 
 	p.consumeToken()
 	right := p.parseExpression(precedence)
 	return &ast.InfixExpression{Operator: operator, Left: left, Right: right}
+}
+
+func (p *Parser) parseGroupedExpression() ast.Expression {
+	p.consumeToken()
+	expression := p.parseExpression(LOWEST)
+	p.expectToken(token.RPAREN)
+
+	return expression
 }

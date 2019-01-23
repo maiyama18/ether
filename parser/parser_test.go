@@ -237,6 +237,56 @@ func TestParser_ParseProgram_InfixExpression(t *testing.T) {
 	}
 }
 
+func TestParser_ParseProgram_ComplexExpression(t *testing.T) {
+	tests := []struct {
+		desc     string
+		input    string
+		expected string
+	}{
+		{
+			desc:     "1 + 2 + 3",
+			input:    "1 + 2 + 3;",
+			expected: "((1 + 2) + 3)",
+		},
+		{
+			desc:     "1 + 2 - 3",
+			input:    "1 + 2 - 3;",
+			expected: "((1 + 2) - 3)",
+		},
+		{
+			desc:     "1 * 2 + 3",
+			input:    "1 * 2 + 3;",
+			expected: "((1 * 2) + 3)",
+		},
+		{
+			desc:     "1 + 2 * 3",
+			input:    "1 + 2 * 3;",
+			expected: "(1 + (2 * 3))",
+		},
+		{
+			desc:     "1 + 2 * 3",
+			input:    "1 + 2 * 3;",
+			expected: "(1 + (2 * 3))",
+		},
+		{
+			desc:     "- -42",
+			input:    "- -42",
+			expected: "(-(-42))",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			program := parseProgram(tt.input)
+			expression := convertProgramToSingleExpression(t, program)
+
+			if actual := expression.String(); actual != tt.expected {
+				t.Errorf("string expression wrong.\nwant=%q\ngot=%q\n", tt.expected, actual)
+			}
+		})
+	}
+}
+
 func parseProgram(input string) *ast.Program {
 	lex := lexer.New(input)
 	parser := New(lex)
