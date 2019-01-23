@@ -101,7 +101,7 @@ func (p *Parser) parseVarStatement() *ast.VarStatement {
 	p.consumeToken()
 
 	expression := p.parseExpression(LOWEST)
-	p.consumeToken() // skip semicolon
+	p.expectToken(token.SEMICOLON)
 
 	return &ast.VarStatement{Identifier: identifier, Expression: expression}
 }
@@ -110,14 +110,14 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	p.consumeToken()
 
 	expression := p.parseExpression(LOWEST)
-	p.consumeToken() // skip semicolon
+	p.expectToken(token.SEMICOLON)
 
 	return &ast.ReturnStatement{Expression: expression}
 }
 
 func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 	expression := p.parseExpression(LOWEST)
-	p.consumeToken() // skip semicolon
+	p.expectToken(token.SEMICOLON)
 
 	return &ast.ExpressionStatement{Expression: expression}
 }
