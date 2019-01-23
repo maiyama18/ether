@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/muiscript/ether/lexer"
-	"github.com/muiscript/ether/token"
+	"github.com/muiscript/ether/parser"
 	"os"
 )
 
@@ -20,10 +20,16 @@ func Start() {
 			continue
 		}
 		input := scanner.Text()
-		lex := lexer.New(input)
 
-		for tok := lex.NextToken(); tok.Type != token.EOF; tok = lex.NextToken() {
-			fmt.Printf("%+v\n", tok)
+		l := lexer.New(input)
+		p := parser.New(l)
+
+		program, err := p.ParseProgram()
+		if err != nil {
+			fmt.Println(err)
+			continue
 		}
+
+		fmt.Println(program.String())
 	}
 }
