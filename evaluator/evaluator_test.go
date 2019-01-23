@@ -48,6 +48,16 @@ func TestEval_IntegerExpression(t *testing.T) {
 			input: "15 / 3;",
 			expected: 5,
 		},
+		{
+			desc: "1 + 2 * 3",
+			input: "1 + 2 * 3;",
+			expected: 7,
+		},
+		{
+			desc: "(1 + 2) * 3",
+			input: "(1 + 2) * 3;",
+			expected: 9,
+		},
 	}
 
 	for _, tt := range tests {
