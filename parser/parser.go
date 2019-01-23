@@ -17,6 +17,17 @@ const (
 	PREFIX
 )
 
+func precedence(t token.Token) Precedence {
+	switch t.Type {
+	case token.PLUS, token.MINUS:
+		return ADDITION
+	case token.ASTER, token.SLASH:
+		return MULTIPLICATION
+	default:
+		return LOWEST
+	}
+}
+
 type Parser struct {
 	lexer        *lexer.Lexer
 	currentToken token.Token
@@ -56,6 +67,14 @@ func (p *Parser) expectToken(tokenType token.Type) {
 		)
 	}
 	p.consumeToken()
+}
+
+func (p *Parser) currentPrecedence() Precedence {
+	return precedence(p.currentToken)
+}
+
+func (p *Parser) peekPrecedence() Precedence {
+	return precedence(p.peekToken)
 }
 
 func (p *Parser) addParserError(line int, msg string) {
@@ -106,7 +125,6 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 	return &ast.ExpressionStatement{Expression: expression}
 }
 
-// TODO: add precedence and parse infix expression
 func (p *Parser) parseExpression(precedence Precedence) ast.Expression {
 	var left ast.Expression
 	switch p.currentToken.Type {
@@ -114,6 +132,11 @@ func (p *Parser) parseExpression(precedence Precedence) ast.Expression {
 		left = p.parseInteger()
 	case token.MINUS:
 		left = p.parsePrefixExpression()
+	}
+
+	for precedence < p.peekPrecedence() {
+		p.consumeToken()
+		left = p.parseInfixExpression(left)
 	}
 
 	return left
@@ -129,4 +152,12 @@ func (p *Parser) parsePrefixExpression() *ast.PrefixExpression {
 	p.consumeToken()
 	right := p.parseExpression(PREFIX)
 	return &ast.PrefixExpression{Operator: operator, Right: right}
+}
+
+func (p *Parser) parseInfixExpression(left ast.Expression) *ast.InfixExpression {
+	precedence := p.currentPrecedence()
+	operator := p.currentToken.Literal
+	p.consumeToken()
+	right := p.parseExpression(precedence)
+	return &ast.InfixExpression{Operator: operator, Left: left, Right: right}
 }
