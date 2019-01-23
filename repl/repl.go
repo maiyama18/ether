@@ -3,7 +3,9 @@ package repl
 import (
 	"bufio"
 	"fmt"
+	"github.com/muiscript/ether/evaluator"
 	"github.com/muiscript/ether/lexer"
+	"github.com/muiscript/ether/object"
 	"github.com/muiscript/ether/parser"
 	"os"
 )
@@ -12,6 +14,8 @@ const PROMPT = "~> "
 
 func Start() {
 	scanner := bufio.NewScanner(os.Stdin)
+
+	env := object.NewEnvironment()
 
 	for {
 		fmt.Print(PROMPT)
@@ -30,6 +34,12 @@ func Start() {
 			continue
 		}
 
-		fmt.Println(program.String())
+		evaluated, err := evaluator.Eval(program, env)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		fmt.Println(evaluated)
 	}
 }
