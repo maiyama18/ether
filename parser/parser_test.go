@@ -189,11 +189,7 @@ func TestParser_ParseProgram_InfixExpression(t *testing.T) {
 			if !ok {
 				t.Errorf("statement type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.InfixExpression{}, infixExpression, infixExpression)
 			}
-			if infixExpression.Operator != tt.expectedOperator {
-				t.Errorf("operator wrong.\nwant=%+v\ngot=%+v\n", tt.expectedOperator, infixExpression.Operator)
-			}
-			testLiteral(t, tt.expectedLeft, infixExpression.Left)
-			testLiteral(t, tt.expectedRight, infixExpression.Right)
+			testInfixExpression(t, tt.expectedOperator, tt.expectedLeft, tt.expectedRight, infixExpression)
 		})
 	}
 }
@@ -231,4 +227,14 @@ func testLiteral(t *testing.T, expected interface{}, expression ast.Expression) 
 			t.Errorf("integer value wrong.\nwant=%+v\ngot=%+v\n", expected, integerLiteral.Value)
 		}
 	}
+}
+
+func testInfixExpression(t *testing.T, expectedOperator string, expectedLeft, expectedRight interface{}, infixExpression *ast.InfixExpression) {
+	t.Helper()
+
+	if infixExpression.Operator != expectedOperator {
+		t.Errorf("operator wrong.\nwant=%+v\ngot=%+v\n", expectedOperator, infixExpression.Operator)
+	}
+	testLiteral(t, expectedLeft, infixExpression.Left)
+	testLiteral(t, expectedRight, infixExpression.Right)
 }
