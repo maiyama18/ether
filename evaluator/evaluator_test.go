@@ -18,6 +18,16 @@ func TestEval_IntegerExpression(t *testing.T) {
 			input: "42;",
 			expected: 42,
 		},
+		{
+			desc: "-42",
+			input: "-42;",
+			expected: -42,
+		},
+		{
+			desc: "-(-42)",
+			input: "-(-42);",
+			expected: 42,
+		},
 	}
 
 	for _, tt := range tests {
