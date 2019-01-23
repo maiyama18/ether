@@ -21,7 +21,7 @@ const (
 	LPAREN = "("
 	RPAREN = ")"
 
-	LET    = "LET"
+	VAR    = "VAR"
 	RETURN = "RETURN"
 )
 
@@ -33,8 +33,8 @@ type Token struct {
 
 func TypeByLiteral(literal string) Type {
 	switch literal {
-	case "let":
-		return LET
+	case "var":
+		return VAR
 	case "return":
 		return RETURN
 	default:

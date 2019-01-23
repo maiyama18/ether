@@ -5,15 +5,15 @@ type Statement interface {
 	StatementNode()
 }
 
-type LetStatement struct {
+type VarStatement struct {
 	Identifier *Identifier
 	Expression Expression
 }
 
-func (ls *LetStatement) String() string {
-	return "let " + ls.Identifier.String() + " = " + ls.Expression.String()
+func (vs *VarStatement) String() string {
+	return "let " + vs.Identifier.String() + " = " + vs.Expression.String()
 }
-func (ls *LetStatement) StatementNode() {}
+func (vs *VarStatement) StatementNode() {}
 
 type ReturnStatement struct {
 	Expression Expression

@@ -14,12 +14,12 @@ func TestParser_ParseProgram_LetStatement(t *testing.T) {
 	}{
 		{
 			desc:         "simple",
-			input:        "let a = 5;",
+			input:        "var a = 5;",
 			expectedName: "a",
 		},
 		{
 			desc:         "multiple-char identifier",
-			input:        "let foo = 42;",
+			input:        "var foo = 42;",
 			expectedName: "foo",
 		},
 	}
@@ -31,12 +31,12 @@ func TestParser_ParseProgram_LetStatement(t *testing.T) {
 			if len(program.Statements) != 1 {
 				t.Errorf("statements length wrong.\nwant=%d\ngot=%d\n", 1, len(program.Statements))
 			}
-			letStatement, ok := program.Statements[0].(*ast.LetStatement)
+			varStatement, ok := program.Statements[0].(*ast.VarStatement)
 			if !ok {
-				t.Errorf("statement type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.LetStatement{}, letStatement, letStatement)
+				t.Errorf("statement type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.VarStatement{}, varStatement, varStatement)
 			}
-			if letStatement.Identifier.Name != tt.expectedName {
-				t.Errorf("identifier name wrong.\nwant=%q\ngot=%q\n", tt.expectedName, letStatement.Identifier.Name)
+			if varStatement.Identifier.Name != tt.expectedName {
+				t.Errorf("identifier name wrong.\nwant=%q\ngot=%q\n", tt.expectedName, varStatement.Identifier.Name)
 			}
 		})
 	}

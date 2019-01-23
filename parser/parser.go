@@ -55,8 +55,8 @@ func (p *Parser) addParserError(line int, msg string) {
 
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.currentToken.Type {
-	case token.LET:
-		return p.parseLetStatement()
+	case token.VAR:
+		return p.parseVarStatement()
 	case token.RETURN:
 		return p.parseReturnStatement()
 	default:
@@ -64,7 +64,7 @@ func (p *Parser) parseStatement() ast.Statement {
 	}
 }
 
-func (p *Parser) parseLetStatement() *ast.LetStatement {
+func (p *Parser) parseVarStatement() *ast.VarStatement {
 	p.consumeToken()
 
 	identifier := &ast.Identifier{Name: p.currentToken.Literal}
@@ -76,7 +76,7 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 		p.consumeToken()
 	}
 
-	return &ast.LetStatement{Identifier: identifier, Expression: nil}
+	return &ast.VarStatement{Identifier: identifier, Expression: nil}
 }
 
 func (p *Parser) parseReturnStatement() *ast.ReturnStatement {

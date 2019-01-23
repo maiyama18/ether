@@ -50,10 +50,10 @@ func TestLexer_NextToken(t *testing.T) {
 		},
 		{
 			desc: "single-char keywords and literals",
-			input: `let a = 5;
+			input: `var a = 5;
 return a;`,
 			expectedTokens: []token.Token{
-				{Type: token.LET, Literal: "let", Line: 1},
+				{Type: token.VAR, Literal: "var", Line: 1},
 				{Type: token.IDENT, Literal: "a", Line: 1},
 				{Type: token.ASSIGN, Literal: "=", Line: 1},
 				{Type: token.INTEGER, Literal: "5", Line: 1},
@@ -67,10 +67,10 @@ return a;`,
 		},
 		{
 			desc: "multichar keywords and literals",
-			input: `let foo = 42;
+			input: `var foo = 42;
 return foo;`,
 			expectedTokens: []token.Token{
-				{Type: token.LET, Literal: "let", Line: 1},
+				{Type: token.VAR, Literal: "var", Line: 1},
 				{Type: token.IDENT, Literal: "foo", Line: 1},
 				{Type: token.ASSIGN, Literal: "=", Line: 1},
 				{Type: token.INTEGER, Literal: "42", Line: 1},
