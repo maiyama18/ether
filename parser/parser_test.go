@@ -54,20 +54,24 @@ func TestParser_ParseProgram_VarStatement(t *testing.T) {
 
 func TestParser_ParseProgram_ReturnStatement(t *testing.T) {
 	tests := []struct {
-		desc  string
-		input string
+		desc               string
+		input              string
+		expectedExpression interface{}
 	}{
 		{
-			desc:  "simple",
-			input: "return a;",
+			desc:               "return a",
+			input:              "return a;",
+			expectedExpression: "a",
 		},
 		{
-			desc:  "multiple-char identifier",
-			input: "return foo;",
+			desc:               "return foo",
+			input:              "return foo;",
+			expectedExpression: "foo",
 		},
 		{
-			desc:  "integer literal",
-			input: "return 42;",
+			desc:               "return 42",
+			input:              "return 42;",
+			expectedExpression: 42,
 		},
 	}
 
@@ -82,6 +86,7 @@ func TestParser_ParseProgram_ReturnStatement(t *testing.T) {
 			if !ok {
 				t.Errorf("statement type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.ReturnStatement{}, returnStatement, returnStatement)
 			}
+			testLiteral(t, tt.expectedExpression, returnStatement.Expression)
 		})
 	}
 }

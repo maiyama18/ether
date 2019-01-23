@@ -109,12 +109,10 @@ func (p *Parser) parseVarStatement() *ast.VarStatement {
 func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	p.consumeToken()
 
-	// TODO: parse expression
-	for p.currentToken.Type != token.SEMICOLON {
-		p.consumeToken()
-	}
+	expression := p.parseExpression(LOWEST)
+	p.consumeToken() // skip semicolon
 
-	return &ast.ReturnStatement{Expression: nil}
+	return &ast.ReturnStatement{Expression: expression}
 }
 
 func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
