@@ -95,16 +95,15 @@ func (p *Parser) parseStatement() ast.Statement {
 func (p *Parser) parseVarStatement() *ast.VarStatement {
 	p.consumeToken()
 
-	identifier := &ast.Identifier{Name: p.currentToken.Literal}
+	identifier := p.parseIdentifier()
 
 	p.expectToken(token.ASSIGN)
+	p.consumeToken()
 
-	// TODO: parse expression
-	for p.currentToken.Type != token.SEMICOLON {
-		p.consumeToken()
-	}
+	expression := p.parseExpression(LOWEST)
+	p.consumeToken() // skip semicolon
 
-	return &ast.VarStatement{Identifier: identifier, Expression: nil}
+	return &ast.VarStatement{Identifier: identifier, Expression: expression}
 }
 
 func (p *Parser) parseReturnStatement() *ast.ReturnStatement {

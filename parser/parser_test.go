@@ -47,6 +47,7 @@ func TestParser_ParseProgram_VarStatement(t *testing.T) {
 			if varStatement.Identifier.Name != tt.expectedName {
 				t.Errorf("identifier name wrong.\nwant=%q\ngot=%q\n", tt.expectedName, varStatement.Identifier.Name)
 			}
+			testLiteral(t, tt.expectedExpression, varStatement.Expression)
 		})
 	}
 }
