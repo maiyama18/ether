@@ -114,6 +114,81 @@ func TestInfixExpression_String(t *testing.T) {
 	}
 }
 
+func TestVarStatement_String(t *testing.T) {
+	tests := []struct {
+		desc       string
+		name       string
+		expression Expression
+		expected   string
+	}{
+		{
+			desc:       "var foo = 42;",
+			name:       "foo",
+			expression: &IntegerLiteral{Value: 42},
+			expected:   "var foo = 42;",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			varStatement := &VarStatement{Identifier: &Identifier{Name: tt.name}, Expression: tt.expression}
+			testString(t, tt.expected, varStatement)
+		})
+	}
+}
+
+func TestReturnStatement_String(t *testing.T) {
+	tests := []struct {
+		desc       string
+		expression Expression
+		expected   string
+	}{
+		{
+			desc:       "return 42;",
+			expression: &IntegerLiteral{Value: 42},
+			expected:   "return 42;",
+		},
+		{
+			desc:       "return foo;",
+			expression: &Identifier{Name: "foo"},
+			expected:   "return foo;",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			returnStatement := &ReturnStatement{Expression: tt.expression}
+			testString(t, tt.expected, returnStatement)
+		})
+	}
+}
+
+func TestExpressionStatement_String(t *testing.T) {
+	tests := []struct {
+		desc       string
+		expression Expression
+		expected   string
+	}{
+		{
+			desc:       "42;",
+			expression: &IntegerLiteral{Value: 42},
+			expected:   "42;",
+		},
+		{
+			desc:       "foo;",
+			expression: &Identifier{Name: "foo"},
+			expected:   "foo;",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			expressionStatement := &ExpressionStatement{Expression: tt.expression}
+			testString(t, tt.expected, expressionStatement)
+		})
+	}
+}
+
 func testString(t *testing.T, expected string, node Node) {
 	if node.String() != expected {
 		t.Errorf("string expression wrong: \nwant=%q\ngot=%q\n", expected, node.String())
