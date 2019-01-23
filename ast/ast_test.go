@@ -9,17 +9,17 @@ func TestIdentifier_String(t *testing.T) {
 		expected string
 	}{
 		{
-			desc:     "one-char",
+			desc:     "a",
 			name:     "a",
 			expected: "a",
 		},
 		{
-			desc:     "multi-char",
+			desc:     "foo",
 			name:     "foo",
 			expected: "foo",
 		},
 		{
-			desc:     "with-number",
+			desc:     "foo2bar3",
 			name:     "foo2bar3",
 			expected: "foo2bar3",
 		},
