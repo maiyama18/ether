@@ -41,6 +41,8 @@ func evalExpression(expression ast.Expression) (object.Object, error) {
 		return &object.Integer{Value: expression.Value}, nil
 	case *ast.PrefixExpression:
 		return evalPrefixExpression(expression)
+	case *ast.InfixExpression:
+		return evalInfixExpression(expression)
 	default:
 		return nil, &EvalError{line: 1, msg: fmt.Sprintf("unable to eval expression: %+v (%T)", expression, expression)}
 	}
@@ -51,15 +53,49 @@ func evalPrefixExpression(prefixExpression *ast.PrefixExpression) (object.Object
 	if err != nil {
 		return nil, err
 	}
-	rightInteger, ok := right.(*object.Integer)
-	if !ok {
-		return nil, &EvalError{line: 1, msg: fmt.Sprintf("unable to convert integer: %+v (%T)", right, right)}
+
+	switch right := right.(type) {
+	case *object.Integer:
+		switch prefixExpression.Operator {
+		case "-":
+			return &object.Integer{Value: -right.Value}, nil
+		default:
+			return nil, &EvalError{line: 1, msg: fmt.Sprintf("unknown prefix operator for integer: %q", prefixExpression.Operator)}
+		}
+	default:
+		return nil, &EvalError{line: 1, msg: fmt.Sprintf("invalid type for prefix expression: %+v (%T)", right, right)}
+	}
+}
+
+func evalInfixExpression(infixExpression *ast.InfixExpression) (object.Object, error) {
+	left, err := evalExpression(infixExpression.Left)
+	if err != nil {
+		return nil, err
+	}
+	right, err := evalExpression(infixExpression.Right)
+	if err != nil {
+		return nil, err
 	}
 
-	switch prefixExpression.Operator {
-	case "-":
-		return &object.Integer{Value: -rightInteger.Value}, nil
+	if left.Type() != right.Type() {
+		return nil, &EvalError{line: 1, msg: fmt.Sprintf("type mismatch in infix expression: %+v %s %+v", left, infixExpression.Operator, right)}
+	}
+	switch left := left.(type) {
+	case *object.Integer:
+		right := right.(*object.Integer)
+		switch infixExpression.Operator {
+		case "+":
+			return &object.Integer{Value: left.Value + right.Value}, nil
+		case "-":
+			return &object.Integer{Value: left.Value - right.Value}, nil
+		case "*":
+			return &object.Integer{Value: left.Value * right.Value}, nil
+		case "/":
+			return &object.Integer{Value: left.Value / right.Value}, nil
+		default:
+			return nil, &EvalError{line: 1, msg: fmt.Sprintf("unknown infix operator for integer: %q", infixExpression.Operator)}
+		}
 	default:
-		return nil, &EvalError{line: 1, msg: fmt.Sprintf("unknown prefix operator: %q", prefixExpression.Operator)}
+		return nil, &EvalError{line: 1, msg: fmt.Sprintf("invalid type for infix expression: %+v (%T)", left, left)}
 	}
 }
