@@ -8,6 +8,15 @@ import (
 	"strconv"
 )
 
+type Precedence int
+
+const (
+	LOWEST Precedence = iota
+	ADDITION
+	MULTIPLICATION
+	PREFIX
+)
+
 type Parser struct {
 	lexer        *lexer.Lexer
 	currentToken token.Token
@@ -91,22 +100,20 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 }
 
 func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
-	expression := p.parseExpression()
+	expression := p.parseExpression(LOWEST)
+	p.consumeToken() // skip semicolon
+
 	return &ast.ExpressionStatement{Expression: expression}
 }
 
 // TODO: add precedence and parse infix expression
-func (p *Parser) parseExpression() ast.Expression {
+func (p *Parser) parseExpression(precedence Precedence) ast.Expression {
 	var left ast.Expression
 	switch p.currentToken.Type {
 	case token.INTEGER:
 		left = p.parseInteger()
 	case token.MINUS:
 		left = p.parsePrefixExpression()
-	}
-
-	if p.peekToken.Type == token.SEMICOLON {
-		p.consumeToken()
 	}
 
 	return left
@@ -120,6 +127,6 @@ func (p *Parser) parseInteger() *ast.IntegerLiteral {
 func (p *Parser) parsePrefixExpression() *ast.PrefixExpression {
 	operator := p.currentToken.Literal
 	p.consumeToken()
-	right := p.parseExpression()
+	right := p.parseExpression(PREFIX)
 	return &ast.PrefixExpression{Operator: operator, Right: right}
 }

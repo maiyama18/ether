@@ -34,3 +34,14 @@ func (pe *PrefixExpression) String() string {
 	return "(" + pe.Operator + pe.Right.String() + ")"
 }
 func (pe *PrefixExpression) ExpressionNode() {}
+
+type InfixExpression struct {
+	Operator string
+	Left     Expression
+	Right    Expression
+}
+
+func (ie *InfixExpression) String() string {
+	return "(" + ie.Left.String() + " " + ie.Operator + " " + ie.Right.String() + ")"
+}
+func (ie *InfixExpression) ExpressionNode() {}

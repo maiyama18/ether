@@ -142,9 +142,65 @@ func TestParser_ParseProgram_PrefixExpression(t *testing.T) {
 	}
 }
 
+// func TestParser_ParseProgram_InfixExpression(t *testing.T) {
+// 	tests := []struct {
+// 		desc             string
+// 		input            string
+// 		expectedOperator string
+// 		expectedLeft     int
+// 		expectedRight    int
+// 	}{
+// 		{
+// 			desc:             "addition",
+// 			input:            "2 + 3;",
+// 			expectedOperator: "+",
+// 			expectedLeft:     2,
+// 			expectedRight:    3,
+// 		},
+// 		{
+// 			desc:             "subtraction",
+// 			input:            "2 - 3;",
+// 			expectedOperator: "-",
+// 			expectedLeft:     2,
+// 			expectedRight:    3,
+// 		},
+// 		{
+// 			desc:             "multiplication",
+// 			input:            "2 * 3;",
+// 			expectedOperator: "*",
+// 			expectedLeft:     2,
+// 			expectedRight:    3,
+// 		},
+// 		{
+// 			desc:             "division",
+// 			input:            "2 / 3;",
+// 			expectedOperator: "*",
+// 			expectedLeft:     2,
+// 			expectedRight:    3,
+// 		},
+// 	}
+//
+// 	for _, tt := range tests {
+// 		t.Run(tt.desc, func(t *testing.T) {
+// 			program := parseProgram(tt.input)
+// 			expression := convertProgramToSingleExpression(t, program)
+//
+// 			infixExpression, ok := expression.(*ast.InfixExpression)
+// 			if !ok {
+// 				t.Errorf("statement type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.InfixExpression{}, infixExpression, infixExpression)
+// 			}
+// 			if infixExpression.Operator != tt.expectedOperator {
+// 				t.Errorf("operator wrong.\nwant=%+v\ngot=%+v\n", tt.expectedOperator, infixExpression.Operator)
+// 			}
+// 			testLiteral(t, tt.expectedLeft, infixExpression.Left)
+// 			testLiteral(t, tt.expectedRight, infixExpression.Right)
+// 		})
+// 	}
+// }
+
 func parseProgram(input string) *ast.Program {
-	lexer := lexer.New(input)
-	parser := New(lexer)
+	lex := lexer.New(input)
+	parser := New(lex)
 
 	return parser.ParseProgram()
 }
