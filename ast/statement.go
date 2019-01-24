@@ -10,6 +10,7 @@ type Statement interface {
 type VarStatement struct {
 	Identifier *Identifier
 	Expression Expression
+	Line       int
 }
 
 func (vs *VarStatement) String() string {
@@ -19,6 +20,7 @@ func (vs *VarStatement) StatementNode() {}
 
 type ReturnStatement struct {
 	Expression Expression
+	Line       int
 }
 
 func (rs *ReturnStatement) String() string { return "return " + rs.Expression.String() + ";" }
@@ -26,6 +28,7 @@ func (rs *ReturnStatement) StatementNode() {}
 
 type ExpressionStatement struct {
 	Expression Expression
+	Line       int
 }
 
 func (es *ExpressionStatement) String() string { return es.Expression.String() + ";" }
@@ -33,6 +36,7 @@ func (es *ExpressionStatement) StatementNode() {}
 
 type BlockStatement struct {
 	Statements []Statement
+	Line       int
 }
 
 func (bs *BlockStatement) String() string {

@@ -10,6 +10,7 @@ type Node interface {
 
 type Program struct {
 	Statements []Statement
+	Line       int
 }
 
 func (p *Program) String() string {

@@ -216,7 +216,7 @@ func TestFunctionLiteral_String(t *testing.T) {
 			desc:       "|a, b| { return a + b; };",
 			parameters: []*Identifier{{Name: "a"}, {Name: "b"}},
 			statements: []Statement{
-				&ReturnStatement{Expression: &InfixExpression{Operator: "+", Left: &Identifier{"a"}, Right: &Identifier{"b"}}},
+				&ReturnStatement{Expression: &InfixExpression{Operator: "+", Left: &Identifier{Name: "a"}, Right: &Identifier{Name: "b"}}},
 			},
 			expected: "|a, b| {return (a + b);}",
 		},

@@ -6,6 +6,7 @@ import (
 	"github.com/muiscript/ether/object"
 )
 
+// TODO: eval return statement
 // TODO: add line to EvalError
 func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 	switch node := node.(type) {

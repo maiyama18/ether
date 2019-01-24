@@ -13,6 +13,7 @@ type Expression interface {
 
 type Identifier struct {
 	Name string
+	Line int
 }
 
 func (i *Identifier) String() string  { return i.Name }
@@ -20,6 +21,7 @@ func (i *Identifier) ExpressionNode() {}
 
 type IntegerLiteral struct {
 	Value int
+	Line  int
 }
 
 func (il *IntegerLiteral) String() string {
@@ -30,6 +32,7 @@ func (il *IntegerLiteral) ExpressionNode() {}
 type PrefixExpression struct {
 	Operator string
 	Right    Expression
+	Line     int
 }
 
 func (pe *PrefixExpression) String() string {
@@ -41,6 +44,7 @@ type InfixExpression struct {
 	Operator string
 	Left     Expression
 	Right    Expression
+	Line     int
 }
 
 func (ie *InfixExpression) String() string {
@@ -51,6 +55,7 @@ func (ie *InfixExpression) ExpressionNode() {}
 type FunctionLiteral struct {
 	Parameters []*Identifier
 	Body       *BlockStatement
+	Line       int
 }
 
 func (fl *FunctionLiteral) String() string {
@@ -70,8 +75,9 @@ func (fl *FunctionLiteral) String() string {
 func (fl *FunctionLiteral) ExpressionNode() {}
 
 type FunctionCall struct {
-	Function Expression // FunctionLiteral or Identifier
+	Function  Expression // FunctionLiteral or Identifier
 	Arguments []Expression
+	Line      int
 }
 
 func (fc *FunctionCall) String() string {
