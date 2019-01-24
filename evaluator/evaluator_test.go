@@ -8,8 +8,6 @@ import (
 	"testing"
 )
 
-// TODO: use sub-tests
-
 func TestEval_Integer(t *testing.T) {
 	tests := []struct {
 		desc     string
@@ -64,14 +62,16 @@ func TestEval_Integer(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		evaluated := eval(t, tt.input)
-		integer, ok := evaluated.(*object.Integer)
-		if !ok {
-			t.Errorf("unable to convert to integer: %+v\n", evaluated)
-		}
-		if integer.Value != tt.expected {
-			t.Errorf("integer value wrong.\nwant=%d\ngot=%d\n", tt.expected, integer.Value)
-		}
+		t.Run(tt.desc, func(t *testing.T) {
+			evaluated := eval(t, tt.input)
+			integer, ok := evaluated.(*object.Integer)
+			if !ok {
+				t.Errorf("unable to convert to integer: %+v\n", evaluated)
+			}
+			if integer.Value != tt.expected {
+				t.Errorf("integer value wrong.\nwant=%d\ngot=%d\n", tt.expected, integer.Value)
+			}
+		})
 	}
 }
 
@@ -107,21 +107,23 @@ func TestEval_Function(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		evaluated := eval(t, tt.input)
-		function, ok := evaluated.(*object.Function)
-		fmt.Printf("%+v\n", function)
-		fmt.Printf("%+v\n", function.Env)
-		if !ok {
-			t.Errorf("unable to convert to function: %+v\n", evaluated)
-		}
-		for i, expectedName := range tt.expectedEnvVarName {
-			expectedValue := tt.expectedEnvVarValue[i]
-			actual := function.Env.Get(expectedName)
-			if actual == nil {
-				t.Errorf("undefined identifier: %s\n", expectedName)
+		t.Run(tt.desc, func(t *testing.T) {
+			evaluated := eval(t, tt.input)
+			function, ok := evaluated.(*object.Function)
+			fmt.Printf("%+v\n", function)
+			fmt.Printf("%+v\n", function.Env)
+			if !ok {
+				t.Errorf("unable to convert to function: %+v\n", evaluated)
 			}
-			testObject(t, expectedValue, actual)
-		}
+			for i, expectedName := range tt.expectedEnvVarName {
+				expectedValue := tt.expectedEnvVarValue[i]
+				actual := function.Env.Get(expectedName)
+				if actual == nil {
+					t.Errorf("undefined identifier: %s\n", expectedName)
+				}
+				testObject(t, expectedValue, actual)
+			}
+		})
 	}
 }
 
@@ -149,14 +151,16 @@ func TestEval_VarStatement(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		evaluated := eval(t, tt.input)
-		integer, ok := evaluated.(*object.Integer)
-		if !ok {
-			t.Errorf("unable to convert to integer: %+v\n", evaluated)
-		}
-		if integer.Value != tt.expected {
-			t.Errorf("integer value wrong.\nwant=%d\ngot=%d\n", tt.expected, integer.Value)
-		}
+		t.Run(tt.desc, func(t *testing.T) {
+			evaluated := eval(t, tt.input)
+			integer, ok := evaluated.(*object.Integer)
+			if !ok {
+				t.Errorf("unable to convert to integer: %+v\n", evaluated)
+			}
+			if integer.Value != tt.expected {
+				t.Errorf("integer value wrong.\nwant=%d\ngot=%d\n", tt.expected, integer.Value)
+			}
+		})
 	}
 }
 
