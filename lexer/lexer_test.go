@@ -85,6 +85,25 @@ return foo;`,
 				{Type: token.EOF, Literal: "", Line: 2},
 			},
 		},
+		{
+			desc:  "comment",
+			input: `var foo = 42;
+# ignore me
+return foo; # this is comment`,
+			expectedTokens: []token.Token{
+				{Type: token.VAR, Literal: "var", Line: 1},
+				{Type: token.IDENT, Literal: "foo", Line: 1},
+				{Type: token.ASSIGN, Literal: "=", Line: 1},
+				{Type: token.INTEGER, Literal: "42", Line: 1},
+				{Type: token.SEMICOLON, Literal: ";", Line: 1},
+
+				{Type: token.RETURN, Literal: "return", Line: 3},
+				{Type: token.IDENT, Literal: "foo", Line: 3},
+				{Type: token.SEMICOLON, Literal: ";", Line: 3},
+				{Type: token.EOF, Literal: "", Line: 3},
+				{Type: token.EOF, Literal: "", Line: 3},
+			},
+		},
 	}
 
 	for _, tt := range tests {

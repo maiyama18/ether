@@ -4,8 +4,6 @@ import (
 	"github.com/muiscript/ether/token"
 )
 
-// TODO: allow comment line begining from #
-
 type Lexer struct {
 	input           string
 	currentPosition int
@@ -26,6 +24,9 @@ func (l *Lexer) NextToken() token.Token {
 
 	var tok token.Token
 	switch l.ch {
+	case '#':
+		l.ignoreComment()
+		return l.NextToken()
 	case '=':
 		tok = token.Token{Type: token.ASSIGN, Literal: "=", Line: l.currentLine}
 	case '+':
@@ -114,6 +115,12 @@ func (l *Lexer) readInteger() string {
 
 func (l *Lexer) skipSpaces() {
 	for l.ch == ' ' || l.ch == '\t' || l.ch == '\r' || l.ch == '\n' {
+		l.consumeChar()
+	}
+}
+
+func (l *Lexer) ignoreComment() {
+	for l.ch != '\n' && l.ch != 0 {
 		l.consumeChar()
 	}
 }

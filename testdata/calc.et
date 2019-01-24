@@ -1,4 +1,4 @@
-var a = (1 + 2) / 3
-var b = 4
+var gen_adder = |x| { |y| { x + y } }
+var add_three = gen_adder(3)
 
-var c a + b
+add_three(4)
