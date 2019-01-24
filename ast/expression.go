@@ -1,7 +1,9 @@
 package ast
 
 import (
+	"bytes"
 	"strconv"
+	"strings"
 )
 
 type Expression interface {
@@ -45,3 +47,24 @@ func (ie *InfixExpression) String() string {
 	return "(" + ie.Left.String() + " " + ie.Operator + " " + ie.Right.String() + ")"
 }
 func (ie *InfixExpression) ExpressionNode() {}
+
+type FunctionLiteral struct {
+	Parameters []*Identifier
+	Body       *BlockStatement
+}
+
+func (fl *FunctionLiteral) String() string {
+	var paramStrs []string
+	for _, param := range fl.Parameters {
+		paramStrs = append(paramStrs, param.String())
+	}
+
+	var out bytes.Buffer
+	out.WriteString("|")
+	out.WriteString(strings.Join(paramStrs, ", "))
+	out.WriteString("| ")
+	out.WriteString(fl.Body.String())
+
+	return out.String()
+}
+func (fl *FunctionLiteral) ExpressionNode() {}

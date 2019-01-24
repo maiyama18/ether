@@ -189,6 +189,47 @@ func TestExpressionStatement_String(t *testing.T) {
 	}
 }
 
+func TestFunctionLiteral_String(t *testing.T) {
+	tests := []struct {
+		desc       string
+		parameters []*Identifier
+		statements []Statement
+		expected   string
+	}{
+		{
+			desc:       "|| { return 1; };",
+			parameters: []*Identifier{},
+			statements: []Statement{
+				&ReturnStatement{Expression: &IntegerLiteral{Value: 1}},
+			},
+			expected: "|| {return 1;}",
+		},
+		{
+			desc:       "|a| { a; };",
+			parameters: []*Identifier{{Name: "a"}},
+			statements: []Statement{
+				&ExpressionStatement{Expression: &Identifier{Name: "a"}},
+			},
+			expected: "|a| {a;}",
+		},
+		{
+			desc:       "|a, b| { return a + b; };",
+			parameters: []*Identifier{{Name: "a"}, {Name: "b"}},
+			statements: []Statement{
+				&ReturnStatement{Expression: &InfixExpression{Operator: "+", Left: &Identifier{"a"}, Right: &Identifier{"b"}}},
+			},
+			expected: "|a, b| {return (a + b);}",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			functionLiteral := &FunctionLiteral{Parameters: tt.parameters, Body: &BlockStatement{Statements: tt.statements}}
+			testString(t, tt.expected, functionLiteral)
+		})
+	}
+}
+
 func testString(t *testing.T, expected string, node Node) {
 	if node.String() != expected {
 		t.Errorf("string expression wrong: \nwant=%q\ngot=%q\n", expected, node.String())

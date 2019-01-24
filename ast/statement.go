@@ -1,5 +1,7 @@
 package ast
 
+import "bytes"
+
 type Statement interface {
 	Node
 	StatementNode()
@@ -28,3 +30,18 @@ type ExpressionStatement struct {
 
 func (es *ExpressionStatement) String() string { return es.Expression.String() + ";" }
 func (es *ExpressionStatement) StatementNode() {}
+
+type BlockStatement struct {
+	Statements []Statement
+}
+
+func (bs *BlockStatement) String() string {
+	var out bytes.Buffer
+	out.WriteString("{")
+	for _, statement := range bs.Statements {
+		out.WriteString(statement.String())
+	}
+	out.WriteString("}")
+	return out.String()
+}
+func (bs *BlockStatement) StatementNode() {}
