@@ -6,7 +6,6 @@ import (
 	"github.com/muiscript/ether/object"
 )
 
-// TODO: eval return statement
 func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 	switch node := node.(type) {
 	case *ast.Program:
@@ -15,6 +14,8 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 		return evalBlockStatement(node, env)
 	case *ast.VarStatement:
 		return evalVarStatement(node, env)
+	case *ast.ReturnStatement:
+		return evalReturnStatement(node, env)
 	case *ast.ExpressionStatement:
 		return evalExpressionStatement(node, env)
 	default:
@@ -29,6 +30,9 @@ func evalProgram(program *ast.Program, env *object.Environment) (object.Object, 
 		evaluated, err = Eval(statement, env)
 		if err != nil {
 			return nil, err
+		}
+		if returnValue, ok := evaluated.(*object.ReturnValue); ok {
+			return returnValue.Value, nil
 		}
 	}
 	return evaluated, nil
@@ -55,9 +59,16 @@ func evalVarStatement(varStatement *ast.VarStatement, env *object.Environment) (
 	return nil, nil
 }
 
+func evalReturnStatement(returnStatement *ast.ReturnStatement, env *object.Environment) (object.Object, error) {
+	value, err := evalExpression(returnStatement.Expression, env)
+	if err != nil {
+		return nil, err
+	}
+	return &object.ReturnValue{Value: value}, nil
+}
+
 func evalExpressionStatement(expressionStatement *ast.ExpressionStatement, env *object.Environment) (object.Object, error) {
-	expression := expressionStatement.Expression
-	return evalExpression(expression, env)
+	return evalExpression(expressionStatement.Expression, env)
 }
 
 func evalExpression(expression ast.Expression, env *object.Environment) (object.Object, error) {
@@ -169,5 +180,18 @@ func evalFunctionCall(functionCall *ast.FunctionCall, env *object.Environment) (
 		enclosedEnv.Set(ident.Name, evaluatedArg)
 	}
 
-	return Eval(function.Body, enclosedEnv)
+	evaluated, err := Eval(function.Body, enclosedEnv)
+	if err != nil {
+		return nil, err
+	}
+	return unwrapReturnValue(evaluated), nil
+}
+
+func unwrapReturnValue(obj object.Object) object.Object {
+	switch obj := obj.(type) {
+	case *object.ReturnValue:
+		return obj.Value
+	default:
+		return obj
+	}
 }

@@ -63,13 +63,7 @@ func TestEval_Integer(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
 			evaluated := eval(t, tt.input)
-			integer, ok := evaluated.(*object.Integer)
-			if !ok {
-				t.Errorf("unable to convert to integer: %+v\n", evaluated)
-			}
-			if integer.Value != tt.expected {
-				t.Errorf("integer value wrong.\nwant=%d\ngot=%d\n", tt.expected, integer.Value)
-			}
+			testObject(t, tt.expected, evaluated)
 		})
 	}
 }
@@ -184,6 +178,37 @@ func TestEval_VarStatement(t *testing.T) {
 		{
 			desc:     "re-assignment",
 			input:    "var a = 42; var b = a; b;",
+			expected: 42,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			evaluated := eval(t, tt.input)
+			testObject(t, tt.expected, evaluated)
+		})
+	}
+}
+
+func TestEval_ReturnStatement(t *testing.T) {
+	tests := []struct {
+		desc     string
+		input    string
+		expected int
+	}{
+		{
+			desc:     "return 42",
+			input:    "return 42;",
+			expected: 42,
+		},
+		{
+			desc:     "1; return 42",
+			input:    "42;",
+			expected: 42,
+		},
+		{
+			desc:     "1; return 42; 1",
+			input:    "42;",
 			expected: 42,
 		},
 	}
