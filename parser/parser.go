@@ -113,8 +113,8 @@ func (p *Parser) parseVarStatement() (*ast.VarStatement, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := p.expectToken(token.SEMICOLON); err != nil {
-		return nil, err
+	if p.peekToken.Type == token.SEMICOLON {
+        p.consumeToken()
 	}
 
 	return &ast.VarStatement{Identifier: identifier, Expression: expression}, nil
@@ -127,8 +127,8 @@ func (p *Parser) parseReturnStatement() (*ast.ReturnStatement, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := p.expectToken(token.SEMICOLON); err != nil {
-		return nil, err
+	if p.peekToken.Type == token.SEMICOLON {
+		p.consumeToken()
 	}
 
 	return &ast.ReturnStatement{Expression: expression}, nil
@@ -139,8 +139,8 @@ func (p *Parser) parseExpressionStatement() (*ast.ExpressionStatement, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := p.expectToken(token.SEMICOLON); err != nil {
-		return nil, err
+	if p.peekToken.Type == token.SEMICOLON {
+		p.consumeToken()
 	}
 
 	return &ast.ExpressionStatement{Expression: expression}, nil
