@@ -4,6 +4,8 @@ import (
 	"github.com/muiscript/ether/token"
 )
 
+// TODO: allow comment line begining from #
+
 type Lexer struct {
 	input           string
 	currentPosition int

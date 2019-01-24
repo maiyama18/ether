@@ -60,6 +60,8 @@ func evalExpression(expression ast.Expression, env *object.Environment) (object.
 		return evalPrefixExpression(expression, env)
 	case *ast.InfixExpression:
 		return evalInfixExpression(expression, env)
+	case *ast.FunctionLiteral:
+		return evalFunctionLiteral(expression, env)
 	default:
 		return nil, &EvalError{line: 1, msg: fmt.Sprintf("unable to eval expression: %+v (%T)", expression, expression)}
 	}
@@ -115,4 +117,8 @@ func evalInfixExpression(infixExpression *ast.InfixExpression, env *object.Envir
 	default:
 		return nil, &EvalError{line: 1, msg: fmt.Sprintf("invalid type for infix expression: %+v (%T)", left, left)}
 	}
+}
+
+func evalFunctionLiteral(functionLiteral *ast.FunctionLiteral, env *object.Environment) (object.Object, error) {
+	return &object.Function{Parameters: functionLiteral.Parameters, Body: functionLiteral.Body, Env: env}, nil
 }
