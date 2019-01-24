@@ -1,7 +1,6 @@
 package evaluator
 
 import (
-	"fmt"
 	"github.com/muiscript/ether/lexer"
 	"github.com/muiscript/ether/object"
 	"github.com/muiscript/ether/parser"
@@ -110,8 +109,6 @@ func TestEval_Function(t *testing.T) {
 		t.Run(tt.desc, func(t *testing.T) {
 			evaluated := eval(t, tt.input)
 			function, ok := evaluated.(*object.Function)
-			fmt.Printf("%+v\n", function)
-			fmt.Printf("%+v\n", function.Env)
 			if !ok {
 				t.Errorf("unable to convert to function: %+v\n", evaluated)
 			}
@@ -123,6 +120,47 @@ func TestEval_Function(t *testing.T) {
 				}
 				testObject(t, expectedValue, actual)
 			}
+		})
+	}
+}
+
+func TestEval_FunctionCall(t *testing.T) {
+	tests := []struct {
+		desc     string
+		input    string
+		expected interface{}
+	}{
+		{
+			desc:     "var five=||{5;};five();",
+			input:    "var five = || { 5; }; five();",
+			expected: 5,
+		},
+		{
+			desc:     "var two=2;var three=3;var five=||{two+three;};five();",
+			input:    "var two = 2;var three = 3; var five = || { two + three; }; five();",
+			expected: 5,
+		},
+		{
+			desc:     "var identity=|x|{x;};identity(42);",
+			input:    "var identity = |x| { x; }; identity(42);",
+			expected: 42,
+		},
+		{
+			desc:     "|x|{x;}(42);",
+			input:    "|x| { x; }(42);",
+			expected: 42,
+		},
+		{
+			desc:     "var add=|x,y|{x+y;};add(7,8);",
+			input:    "var add = |x, y| { x + y; }; add(7, 8);",
+			expected: 15,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			evaluated := eval(t, tt.input)
+			testObject(t, tt.expected, evaluated)
 		})
 	}
 }
@@ -153,13 +191,7 @@ func TestEval_VarStatement(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
 			evaluated := eval(t, tt.input)
-			integer, ok := evaluated.(*object.Integer)
-			if !ok {
-				t.Errorf("unable to convert to integer: %+v\n", evaluated)
-			}
-			if integer.Value != tt.expected {
-				t.Errorf("integer value wrong.\nwant=%d\ngot=%d\n", tt.expected, integer.Value)
-			}
+			testObject(t, tt.expected, evaluated)
 		})
 	}
 }
@@ -185,8 +217,12 @@ func eval(t *testing.T, input string) object.Object {
 func testObject(t *testing.T, expectedValue interface{}, actual object.Object) {
 	switch expectedValue := expectedValue.(type) {
 	case int:
-		if actualValue := actual.(*object.Integer).Value; actualValue != expectedValue {
-			t.Errorf("integer value wrong:\nwant=%d\ngot=%d\n", expectedValue, actualValue)
+		integer, ok := actual.(*object.Integer)
+		if !ok {
+			t.Fatalf("unable to convert to integer: %+v\n", actual)
+		}
+		if integer.Value != expectedValue {
+			t.Errorf("integer value wrong:\nwant=%d\ngot=%d\n", expectedValue, integer.Value)
 		}
 	default:
 		t.Errorf("unexpected type: %T", expectedValue)

@@ -11,6 +11,8 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 	switch node := node.(type) {
 	case *ast.Program:
 		return evalProgram(node, env)
+	case *ast.BlockStatement:
+		return evalBlockStatement(node, env)
 	case *ast.VarStatement:
 		return evalVarStatement(node, env)
 	case *ast.ExpressionStatement:
@@ -23,6 +25,18 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 func evalProgram(program *ast.Program, env *object.Environment) (object.Object, error) {
 	var evaluated object.Object
 	for _, statement := range program.Statements {
+		var err error
+		evaluated, err = Eval(statement, env)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return evaluated, nil
+}
+
+func evalBlockStatement(blockStatement *ast.BlockStatement, env *object.Environment) (object.Object, error) {
+	var evaluated object.Object
+	for _, statement := range blockStatement.Statements {
 		var err error
 		evaluated, err = Eval(statement, env)
 		if err != nil {
@@ -62,6 +76,8 @@ func evalExpression(expression ast.Expression, env *object.Environment) (object.
 		return evalInfixExpression(expression, env)
 	case *ast.FunctionLiteral:
 		return evalFunctionLiteral(expression, env)
+	case *ast.FunctionCall:
+		return evalFunctionCall(expression, env)
 	default:
 		return nil, &EvalError{line: 1, msg: fmt.Sprintf("unable to eval expression: %+v (%T)", expression, expression)}
 	}
@@ -121,4 +137,37 @@ func evalInfixExpression(infixExpression *ast.InfixExpression, env *object.Envir
 
 func evalFunctionLiteral(functionLiteral *ast.FunctionLiteral, env *object.Environment) (object.Object, error) {
 	return &object.Function{Parameters: functionLiteral.Parameters, Body: functionLiteral.Body, Env: env}, nil
+}
+
+func evalFunctionCall(functionCall *ast.FunctionCall, env *object.Environment) (object.Object, error) {
+	functionExp, err := evalExpression(functionCall.Function, env)
+	if err != nil {
+		return nil, err
+	}
+	function, ok := functionExp.(*object.Function)
+	if !ok {
+		return nil, &EvalError{line: 1, msg: fmt.Sprintf("unable to convert to function: %+v (%T)", functionExp, functionExp)}
+	}
+
+	if len(functionCall.Arguments) != len(function.Parameters) {
+		return nil, &EvalError{line: 1, msg: fmt.Sprintf("number of arguments for %+v wrong:\nwant=%d\ngot=%d\n", function, len(function.Parameters), len(functionCall.Arguments))}
+	}
+
+	var evaluatedArgs []object.Object
+	for _, arg := range functionCall.Arguments {
+		evaluatedArg, err := evalExpression(arg, env);
+		if err != nil {
+			return nil, err
+		}
+
+		evaluatedArgs = append(evaluatedArgs, evaluatedArg)
+	}
+
+	enclosedEnv := object.NewEnclosedEnvironment(function.Env)
+	for i, evaluatedArg := range evaluatedArgs {
+		ident := function.Parameters[i]
+		enclosedEnv.Set(ident.Name, evaluatedArg)
+	}
+
+	return Eval(function.Body, enclosedEnv)
 }
