@@ -38,6 +38,10 @@ func (l *Lexer) NextToken() token.Token {
 		tok = token.Token{Type: token.LPAREN, Literal: "(", Line: l.currentLine}
 	case ')':
 		tok = token.Token{Type: token.RPAREN, Literal: ")", Line: l.currentLine}
+	case '{':
+		tok = token.Token{Type: token.LBRACE, Literal: "{", Line: l.currentLine}
+	case '}':
+		tok = token.Token{Type: token.RBRACE, Literal: "}", Line: l.currentLine}
 	case '|':
 		tok = token.Token{Type: token.BAR, Literal: "|", Line: l.currentLine}
 	case ',':

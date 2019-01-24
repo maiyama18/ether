@@ -143,18 +143,36 @@ func (p *Parser) parseExpressionStatement() (*ast.ExpressionStatement, error) {
 	return &ast.ExpressionStatement{Expression: expression}, nil
 }
 
+func (p *Parser) parseBlockStatement() (*ast.BlockStatement, error) {
+	p.consumeToken()
+	statements := make([]ast.Statement, 0)
+
+	for p.currentToken.Type != token.RBRACE {
+		statement, err := p.parseStatement()
+		if err != nil {
+			return nil, err
+		}
+		statements = append(statements, statement)
+		p.consumeToken()
+	}
+
+	return &ast.BlockStatement{Statements: statements}, nil
+}
+
 func (p *Parser) parseExpression(precedence Precedence) (ast.Expression, error) {
 	var left ast.Expression
 	var err error
 	switch p.currentToken.Type {
 	case token.INTEGER:
-		left, err = p.parseInteger()
+		left, err = p.parseIntegerLiteral()
 	case token.IDENT:
 		left, err = p.parseIdentifier()
 	case token.MINUS:
 		left, err = p.parsePrefixExpression()
 	case token.LPAREN:
 		left, err = p.parseGroupedExpression()
+	case token.BAR:
+		left, err = p.parseFunctionLiteral()
 	default:
 		return nil, &ParserError{line: p.currentToken.Line, msg: fmt.Sprintf("unable to parse token %+v\n", p.currentToken)}
 	}
@@ -173,7 +191,7 @@ func (p *Parser) parseExpression(precedence Precedence) (ast.Expression, error) 
 	return left, nil
 }
 
-func (p *Parser) parseInteger() (*ast.IntegerLiteral, error) {
+func (p *Parser) parseIntegerLiteral() (*ast.IntegerLiteral, error) {
 	v, err := strconv.Atoi(p.currentToken.Literal)
 	if err != nil {
 		return nil, &ParserError{line: p.currentToken.Line, msg: err.Error()}
@@ -182,6 +200,9 @@ func (p *Parser) parseInteger() (*ast.IntegerLiteral, error) {
 }
 
 func (p *Parser) parseIdentifier() (*ast.Identifier, error) {
+	if p.currentToken.Type != token.IDENT {
+		return nil, &ParserError{line: p.currentToken.Line, msg: fmt.Sprintf("not identifier: %+v", p.currentToken)}
+	}
 	return &ast.Identifier{Name: p.currentToken.Literal}, nil
 }
 
@@ -217,4 +238,52 @@ func (p *Parser) parseGroupedExpression() (ast.Expression, error) {
 	}
 
 	return expression, nil
+}
+
+func (p *Parser) parseFunctionLiteral() (ast.Expression, error) {
+	parameters, err := p.parseFunctionParameters()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := p.expectToken(token.LBRACE); err != nil {
+		return nil, err
+	}
+	body, err := p.parseBlockStatement()
+	if err != nil {
+		return nil, err
+	}
+
+	return &ast.FunctionLiteral{Parameters: parameters, Body: body}, nil
+}
+
+func (p *Parser) parseFunctionParameters() ([]*ast.Identifier, error) {
+	p.consumeToken()
+	if p.currentToken.Type == token.BAR {
+		return []*ast.Identifier{}, nil
+	}
+
+	first, err := p.parseIdentifier()
+	if err != nil {
+		return nil, err
+	}
+	parameters := []*ast.Identifier{first}
+
+	for p.peekToken.Type != token.BAR {
+		if err := p.expectToken(token.COMMA); err != nil {
+			return nil, err
+		}
+		p.consumeToken()
+
+		parameter, err := p.parseIdentifier()
+		if err != nil {
+			return nil, err
+		}
+		parameters = append(parameters, parameter)
+	}
+	if err := p.expectToken(token.BAR); err != nil {
+		return nil, err
+	}
+
+	return parameters, nil
 }

@@ -112,7 +112,7 @@ func TestParser_ParseProgram_IntegerLiteral(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
 			program := parseProgram(t, tt.input)
-			expression := convertProgramToSingleExpression(t, program)
+			expression := convertStatementsToSingleExpression(t, program.Statements)
 
 			testLiteral(t, tt.expected, expression)
 		})
@@ -140,7 +140,7 @@ func TestParser_ParseProgram_Identifier(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
 			program := parseProgram(t, tt.input)
-			expression := convertProgramToSingleExpression(t, program)
+			expression := convertStatementsToSingleExpression(t, program.Statements)
 
 			testLiteral(t, tt.expected, expression)
 		})
@@ -171,7 +171,7 @@ func TestParser_ParseProgram_PrefixExpression(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
 			program := parseProgram(t, tt.input)
-			expression := convertProgramToSingleExpression(t, program)
+			expression := convertStatementsToSingleExpression(t, program.Statements)
 
 			prefixExpression, ok := expression.(*ast.PrefixExpression)
 			if !ok {
@@ -226,7 +226,7 @@ func TestParser_ParseProgram_InfixExpression(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
 			program := parseProgram(t, tt.input)
-			expression := convertProgramToSingleExpression(t, program)
+			expression := convertStatementsToSingleExpression(t, program.Statements)
 
 			infixExpression, ok := expression.(*ast.InfixExpression)
 			if !ok {
@@ -237,7 +237,62 @@ func TestParser_ParseProgram_InfixExpression(t *testing.T) {
 	}
 }
 
-func TestParser_ParseProgram_ComplexExpression(t *testing.T) {
+func TestParser_ParseProgram_FunctionLiteral(t *testing.T) {
+	tests := []struct {
+		desc                string
+		input               string
+		expectedParamNames  []string
+		expectedReturnValue interface{}
+	}{
+		{
+			desc:                "|| { 42; };",
+			input:               "|| { 42; };",
+			expectedParamNames:  []string{},
+			expectedReturnValue: 42,
+		},
+		{
+			desc:                "|x| { x; };",
+			input:               "|x| { x; };",
+			expectedParamNames:  []string{"x"},
+			expectedReturnValue: "x",
+		},
+		{
+			desc:                "|x, y| { x; };",
+			input:               "|x, y| { x; };",
+			expectedParamNames:  []string{"x", "y"},
+			expectedReturnValue: "x",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			program := parseProgram(t, tt.input)
+			expression := convertStatementsToSingleExpression(t, program.Statements)
+
+			functionLiteral, ok := expression.(*ast.FunctionLiteral)
+			if !ok {
+				t.Errorf("statement type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.FunctionLiteral{}, functionLiteral, functionLiteral)
+			}
+
+			if len(functionLiteral.Parameters) != len(tt.expectedParamNames) {
+				t.Errorf("parameter length wrong.\nwant=%d\ngot=%d\n", len(tt.expectedParamNames), len(functionLiteral.Parameters))
+			}
+			for i, expectedParamName := range tt.expectedParamNames {
+				if functionLiteral.Parameters[i].Name != expectedParamName {
+					t.Errorf("%d-th parameter name wrong.\nwant=%+v\ngot=%+v\n", i, expectedParamName, functionLiteral.Parameters[i].Name)
+				}
+			}
+
+			if len(functionLiteral.Body.Statements) != 1 {
+				t.Errorf("number of statements wrong.\nwant=%d\ngot=%d\n", 1, len(functionLiteral.Body.Statements))
+			}
+			returnExpression := convertStatementsToSingleExpression(t, functionLiteral.Body.Statements)
+			testLiteral(t, tt.expectedReturnValue, returnExpression)
+		})
+	}
+}
+
+func TestParser_ParseProgram_ComplexArithmetic(t *testing.T) {
 	tests := []struct {
 		desc     string
 		input    string
@@ -278,7 +333,7 @@ func TestParser_ParseProgram_ComplexExpression(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
 			program := parseProgram(t, tt.input)
-			expression := convertProgramToSingleExpression(t, program)
+			expression := convertStatementsToSingleExpression(t, program.Statements)
 
 			if actual := expression.String(); actual != tt.expected {
 				t.Errorf("string expression wrong.\nwant=%q\ngot=%q\n", tt.expected, actual)
@@ -298,13 +353,13 @@ func parseProgram(t *testing.T, input string) *ast.Program {
 	return program
 }
 
-func convertProgramToSingleExpression(t *testing.T, program *ast.Program) ast.Expression {
+func convertStatementsToSingleExpression(t *testing.T, statements []ast.Statement) ast.Expression {
 	t.Helper()
 
-	if len(program.Statements) != 1 {
-		t.Errorf("statements length wrong.\nwant=%d\ngot=%d\n", 1, len(program.Statements))
+	if len(statements) != 1 {
+		t.Errorf("statements length wrong.\nwant=%d\ngot=%d\n", 1, len(statements))
 	}
-	expressionStatement, ok := program.Statements[0].(*ast.ExpressionStatement)
+	expressionStatement, ok := statements[0].(*ast.ExpressionStatement)
 	if !ok {
 		t.Errorf("statement type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.ExpressionStatement{}, expressionStatement, expressionStatement)
 	}
