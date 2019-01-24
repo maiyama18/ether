@@ -4,6 +4,10 @@ import (
 	"github.com/muiscript/ether/token"
 )
 
+// TODO: implement arrow operator
+// TODO: implement array
+// TODO: implement builtin function
+
 type Lexer struct {
 	input           string
 	currentPosition int
