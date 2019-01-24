@@ -20,6 +20,7 @@ const (
 
 	LPAREN = "LPAREN"
 	RPAREN = "RPAREN"
+	BAR    = "BAR"
 
 	VAR    = "VAR"
 	RETURN = "RETURN"

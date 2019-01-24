@@ -2,3 +2,12 @@ var a = (1 + 2) / 3;
 var b = 4 * 5 - 6 ;
 
 a + b;
+
+var c = count(a)
+[1, 2, 3]
+-> double
+-> fn(x) { var a = 4; 2 * a }
+
+var a = [1, 2, 3]
+var m = map(a, fn(x) { )
+|a, b| => { a + b }

@@ -35,7 +35,7 @@ func TestParser_ParseProgram_VarStatement(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
-			program := parseProgram(tt.input)
+			program := parseProgram(t, tt.input)
 
 			if len(program.Statements) != 1 {
 				t.Errorf("statements length wrong.\nwant=%d\ngot=%d\n", 1, len(program.Statements))
@@ -77,7 +77,7 @@ func TestParser_ParseProgram_ReturnStatement(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
-			program := parseProgram(tt.input)
+			program := parseProgram(t, tt.input)
 
 			if len(program.Statements) != 1 {
 				t.Errorf("statements length wrong.\nwant=%d\ngot=%d\n", 1, len(program.Statements))
@@ -111,7 +111,7 @@ func TestParser_ParseProgram_IntegerLiteral(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
-			program := parseProgram(tt.input)
+			program := parseProgram(t, tt.input)
 			expression := convertProgramToSingleExpression(t, program)
 
 			testLiteral(t, tt.expected, expression)
@@ -139,7 +139,7 @@ func TestParser_ParseProgram_Identifier(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
-			program := parseProgram(tt.input)
+			program := parseProgram(t, tt.input)
 			expression := convertProgramToSingleExpression(t, program)
 
 			testLiteral(t, tt.expected, expression)
@@ -170,7 +170,7 @@ func TestParser_ParseProgram_PrefixExpression(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
-			program := parseProgram(tt.input)
+			program := parseProgram(t, tt.input)
 			expression := convertProgramToSingleExpression(t, program)
 
 			prefixExpression, ok := expression.(*ast.PrefixExpression)
@@ -225,7 +225,7 @@ func TestParser_ParseProgram_InfixExpression(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
-			program := parseProgram(tt.input)
+			program := parseProgram(t, tt.input)
 			expression := convertProgramToSingleExpression(t, program)
 
 			infixExpression, ok := expression.(*ast.InfixExpression)
@@ -270,14 +270,14 @@ func TestParser_ParseProgram_ComplexExpression(t *testing.T) {
 		},
 		{
 			desc:     "- -42",
-			input:    "- -42",
+			input:    "- -42;",
 			expected: "(-(-42))",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
-			program := parseProgram(tt.input)
+			program := parseProgram(t, tt.input)
 			expression := convertProgramToSingleExpression(t, program)
 
 			if actual := expression.String(); actual != tt.expected {
@@ -287,11 +287,15 @@ func TestParser_ParseProgram_ComplexExpression(t *testing.T) {
 	}
 }
 
-func parseProgram(input string) *ast.Program {
+func parseProgram(t *testing.T, input string) *ast.Program {
 	lex := lexer.New(input)
 	parser := New(lex)
 
-	return parser.ParseProgram()
+	program, err := parser.ParseProgram()
+	if err != nil {
+		t.Fatalf("parse error: %s", err.Error())
+	}
+	return program
 }
 
 func convertProgramToSingleExpression(t *testing.T, program *ast.Program) ast.Expression {
