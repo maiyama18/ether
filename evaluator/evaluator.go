@@ -46,6 +46,9 @@ func evalBlockStatement(blockStatement *ast.BlockStatement, env *object.Environm
 		if err != nil {
 			return nil, err
 		}
+		if returnValue, ok := evaluated.(*object.ReturnValue); ok {
+			return returnValue, nil
+		}
 	}
 	return evaluated, nil
 }

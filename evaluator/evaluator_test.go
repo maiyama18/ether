@@ -149,6 +149,21 @@ func TestEval_FunctionCall(t *testing.T) {
 			input:    "var add = |x, y| { x + y; }; add(7, 8);",
 			expected: 15,
 		},
+		{
+			desc:     "var five=||{return 5;};five();",
+			input:    "var five = || { return 5; }; five();",
+			expected: 5,
+		},
+		{
+			desc:     "var five=||{4;return 5;};five();",
+			input:    "var five = || { 4; return 5; }; five();",
+			expected: 5,
+		},
+		{
+			desc:     "var five=||{4;return 5;4;};five();",
+			input:    "var five = || { 4; return 5; 4; }; five();",
+			expected: 5,
+		},
 	}
 
 	for _, tt := range tests {
