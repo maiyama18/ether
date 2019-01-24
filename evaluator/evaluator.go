@@ -7,7 +7,6 @@ import (
 )
 
 // TODO: eval return statement
-// TODO: add line to EvalError
 func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 	switch node := node.(type) {
 	case *ast.Program:
@@ -19,7 +18,7 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 	case *ast.ExpressionStatement:
 		return evalExpressionStatement(node, env)
 	default:
-		return nil, &EvalError{line: 1, msg: fmt.Sprintf("unable to eval node: %+v (%T)", node, node)}
+		return nil, &EvalError{line: node.Line(), msg: fmt.Sprintf("unable to eval node: %+v (%T)", node, node)}
 	}
 }
 
@@ -68,7 +67,7 @@ func evalExpression(expression ast.Expression, env *object.Environment) (object.
 	case *ast.Identifier:
 		value := env.Get(expression.Name)
 		if value == nil {
-			return nil, &EvalError{line: 1, msg: fmt.Sprintf("undefined identifier: %q", expression.Name)}
+			return nil, &EvalError{line: expression.Line(), msg: fmt.Sprintf("undefined identifier: %q", expression.Name)}
 		}
 		return value, nil
 	case *ast.PrefixExpression:
@@ -80,7 +79,7 @@ func evalExpression(expression ast.Expression, env *object.Environment) (object.
 	case *ast.FunctionCall:
 		return evalFunctionCall(expression, env)
 	default:
-		return nil, &EvalError{line: 1, msg: fmt.Sprintf("unable to eval expression: %+v (%T)", expression, expression)}
+		return nil, &EvalError{line: expression.Line(), msg: fmt.Sprintf("unable to eval expression: %+v (%T)", expression, expression)}
 	}
 }
 
@@ -96,10 +95,10 @@ func evalPrefixExpression(prefixExpression *ast.PrefixExpression, env *object.En
 		case "-":
 			return &object.Integer{Value: -right.Value}, nil
 		default:
-			return nil, &EvalError{line: 1, msg: fmt.Sprintf("unknown prefix operator for integer: %q", prefixExpression.Operator)}
+			return nil, &EvalError{line: prefixExpression.Line(), msg: fmt.Sprintf("unknown prefix operator for integer: %q", prefixExpression.Operator)}
 		}
 	default:
-		return nil, &EvalError{line: 1, msg: fmt.Sprintf("invalid type for prefix expression: %+v (%T)", right, right)}
+		return nil, &EvalError{line: prefixExpression.Right.Line(), msg: fmt.Sprintf("invalid type for prefix expression: %+v (%T)", right, right)}
 	}
 }
 
@@ -114,7 +113,7 @@ func evalInfixExpression(infixExpression *ast.InfixExpression, env *object.Envir
 	}
 
 	if left.Type() != right.Type() {
-		return nil, &EvalError{line: 1, msg: fmt.Sprintf("type mismatch in infix expression: %+v %s %+v", left, infixExpression.Operator, right)}
+		return nil, &EvalError{line: infixExpression.Line(), msg: fmt.Sprintf("type mismatch in infix expression: %+v %s %+v", left, infixExpression.Operator, right)}
 	}
 	switch left := left.(type) {
 	case *object.Integer:
@@ -129,10 +128,10 @@ func evalInfixExpression(infixExpression *ast.InfixExpression, env *object.Envir
 		case "/":
 			return &object.Integer{Value: left.Value / right.Value}, nil
 		default:
-			return nil, &EvalError{line: 1, msg: fmt.Sprintf("unknown infix operator for integer: %q", infixExpression.Operator)}
+			return nil, &EvalError{line: infixExpression.Line(), msg: fmt.Sprintf("unknown infix operator for integer: %q", infixExpression.Operator)}
 		}
 	default:
-		return nil, &EvalError{line: 1, msg: fmt.Sprintf("invalid type for infix expression: %+v (%T)", left, left)}
+		return nil, &EvalError{line: infixExpression.Line(), msg: fmt.Sprintf("invalid type for infix expression: %+v (%T)", left, left)}
 	}
 }
 
@@ -147,11 +146,11 @@ func evalFunctionCall(functionCall *ast.FunctionCall, env *object.Environment) (
 	}
 	function, ok := functionExp.(*object.Function)
 	if !ok {
-		return nil, &EvalError{line: 1, msg: fmt.Sprintf("unable to convert to function: %+v (%T)", functionExp, functionExp)}
+		return nil, &EvalError{line: functionCall.Line(), msg: fmt.Sprintf("unable to convert to function: %+v (%T)", functionExp, functionExp)}
 	}
 
 	if len(functionCall.Arguments) != len(function.Parameters) {
-		return nil, &EvalError{line: 1, msg: fmt.Sprintf("number of arguments for %+v wrong:\nwant=%d\ngot=%d\n", function, len(function.Parameters), len(functionCall.Arguments))}
+		return nil, &EvalError{line: functionCall.Arguments[0].Line(), msg: fmt.Sprintf("number of arguments for %+v wrong:\nwant=%d\ngot=%d\n", function, len(function.Parameters), len(functionCall.Arguments))}
 	}
 
 	var evaluatedArgs []object.Object

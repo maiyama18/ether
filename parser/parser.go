@@ -58,7 +58,7 @@ func (p *Parser) ParseProgram() (*ast.Program, error) {
 		p.consumeToken()
 	}
 
-	return &ast.Program{Statements: statements, Line: 1}, nil
+	return &ast.Program{Statements: statements}, nil
 }
 
 func (p *Parser) consumeToken() {
@@ -118,7 +118,7 @@ func (p *Parser) parseVarStatement() (*ast.VarStatement, error) {
         p.consumeToken()
 	}
 
-	return &ast.VarStatement{Identifier: identifier, Expression: expression, Line: line}, nil
+	return ast.NewVarStatement(identifier, expression, line), nil
 }
 
 func (p *Parser) parseReturnStatement() (*ast.ReturnStatement, error) {
@@ -133,7 +133,7 @@ func (p *Parser) parseReturnStatement() (*ast.ReturnStatement, error) {
 		p.consumeToken()
 	}
 
-	return &ast.ReturnStatement{Expression: expression, Line: line}, nil
+	return ast.NewReturnStatement(expression, line), nil
 }
 
 func (p *Parser) parseExpressionStatement() (*ast.ExpressionStatement, error) {
@@ -146,7 +146,7 @@ func (p *Parser) parseExpressionStatement() (*ast.ExpressionStatement, error) {
 		p.consumeToken()
 	}
 
-	return &ast.ExpressionStatement{Expression: expression, Line: line}, nil
+	return ast.NewExpressionStatement(expression, line), nil
 }
 
 func (p *Parser) parseBlockStatement() (*ast.BlockStatement, error) {
@@ -163,7 +163,7 @@ func (p *Parser) parseBlockStatement() (*ast.BlockStatement, error) {
 		p.consumeToken()
 	}
 
-	return &ast.BlockStatement{Statements: statements, Line: line}, nil
+	return ast.NewBlockStatement(statements, line), nil
 }
 
 func (p *Parser) parseExpression(precedence Precedence) (ast.Expression, error) {
@@ -209,7 +209,7 @@ func (p *Parser) parseIntegerLiteral() (*ast.IntegerLiteral, error) {
 	if err != nil {
 		return nil, &ParserError{line: line, msg: err.Error()}
 	}
-	return &ast.IntegerLiteral{Value: v, Line: line}, nil
+	return ast.NewIntegerLiteral(v, line), nil
 }
 
 func (p *Parser) parseIdentifier() (*ast.Identifier, error) {
@@ -217,7 +217,7 @@ func (p *Parser) parseIdentifier() (*ast.Identifier, error) {
 	if p.currentToken.Type != token.IDENT {
 		return nil, &ParserError{line: line, msg: fmt.Sprintf("not identifier: %+v", p.currentToken)}
 	}
-	return &ast.Identifier{Name: p.currentToken.Literal, Line: line}, nil
+	return ast.NewIdentifier(p.currentToken.Literal, line), nil
 }
 
 func (p *Parser) parsePrefixExpression() (*ast.PrefixExpression, error) {
@@ -228,7 +228,7 @@ func (p *Parser) parsePrefixExpression() (*ast.PrefixExpression, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &ast.PrefixExpression{Operator: operator, Right: right, Line: line}, nil
+	return ast.NewPrefixExpression(operator, right, line), nil
 }
 
 func (p *Parser) parseGroupedExpression() (ast.Expression, error) {
@@ -240,7 +240,6 @@ func (p *Parser) parseGroupedExpression() (ast.Expression, error) {
 	if err := p.expectToken(token.RPAREN); err != nil {
 		return nil, err
 	}
-
 	return expression, nil
 }
 
@@ -267,7 +266,7 @@ func (p *Parser) parseFunctionLiteral() (ast.Expression, error) {
 		return nil, err
 	}
 
-	return &ast.FunctionLiteral{Parameters: parameters, Body: body, Line: line}, nil
+	return ast.NewFunctionLiteral(parameters, body, line), nil
 }
 
 func (p *Parser) parseInfixExpression(left ast.Expression) (*ast.InfixExpression, error) {
@@ -279,7 +278,7 @@ func (p *Parser) parseInfixExpression(left ast.Expression) (*ast.InfixExpression
 	if err != nil {
 		return nil, err
 	}
-	return &ast.InfixExpression{Operator: operator, Left: left, Right: right, Line: line}, nil
+	return ast.NewInfixExpression(operator, left, right, line), nil
 }
 
 func (p *Parser) parseFunctionCall(left ast.Expression) (*ast.FunctionCall, error) {
@@ -288,7 +287,7 @@ func (p *Parser) parseFunctionCall(left ast.Expression) (*ast.FunctionCall, erro
 	if err != nil {
 		return nil, err
 	}
-	return &ast.FunctionCall{Function: left, Arguments: arguments, Line: line}, nil
+	return ast.NewFunctionCall(left, arguments, line), nil
 }
 
 func (p *Parser) parseCommaSeparatedExpressions(endTokenType token.Type) ([]ast.Expression, error) {

@@ -5,14 +5,15 @@ import (
 )
 
 type Node interface {
+	Line() int
 	String() string
 }
 
 type Program struct {
 	Statements []Statement
-	Line       int
 }
 
+func (p *Program) Line() int { return 1 }
 func (p *Program) String() string {
 	var out bytes.Buffer
 	for _, statement := range p.Statements {
