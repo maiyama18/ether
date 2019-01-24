@@ -68,3 +68,24 @@ func (fl *FunctionLiteral) String() string {
 	return out.String()
 }
 func (fl *FunctionLiteral) ExpressionNode() {}
+
+type FunctionCall struct {
+	Function Expression // FunctionLiteral or Identifier
+	Arguments []Expression
+}
+
+func (fc *FunctionCall) String() string {
+	var argStrs []string
+	for _, arg := range fc.Arguments {
+		argStrs = append(argStrs, arg.String())
+	}
+
+	var out bytes.Buffer
+	out.WriteString(fc.Function.String())
+	out.WriteString("(")
+	out.WriteString(strings.Join(argStrs, ", "))
+	out.WriteString(")")
+
+	return out.String()
+}
+func (fc *FunctionCall) ExpressionNode() {}

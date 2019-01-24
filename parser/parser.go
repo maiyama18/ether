@@ -15,6 +15,7 @@ const (
 	ADDITION
 	MULTIPLICATION
 	PREFIX
+	CALL
 )
 
 func precedence(t token.Token) Precedence {
@@ -23,6 +24,8 @@ func precedence(t token.Token) Precedence {
 		return ADDITION
 	case token.ASTER, token.SLASH:
 		return MULTIPLICATION
+	case token.LPAREN:
+		return PREFIX
 	default:
 		return LOWEST
 	}
@@ -174,7 +177,7 @@ func (p *Parser) parseExpression(precedence Precedence) (ast.Expression, error) 
 	case token.BAR:
 		left, err = p.parseFunctionLiteral()
 	default:
-		return nil, &ParserError{line: p.currentToken.Line, msg: fmt.Sprintf("unable to parse token %+v\n", p.currentToken)}
+		return nil, &ParserError{line: p.currentToken.Line, msg: fmt.Sprintf("unable to parse prefix token %+v\n", p.currentToken)}
 	}
 	if err != nil {
 		return nil, err
@@ -182,7 +185,12 @@ func (p *Parser) parseExpression(precedence Precedence) (ast.Expression, error) 
 
 	for precedence < p.peekPrecedence() {
 		p.consumeToken()
-		left, err = p.parseInfixExpression(left)
+		switch p.currentToken.Type {
+		case token.LPAREN:
+			left, err = p.parseFunctionCall(left)
+		default:
+			left, err = p.parseInfixExpression(left)
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -216,17 +224,6 @@ func (p *Parser) parsePrefixExpression() (*ast.PrefixExpression, error) {
 	return &ast.PrefixExpression{Operator: operator, Right: right}, nil
 }
 
-func (p *Parser) parseInfixExpression(left ast.Expression) (*ast.InfixExpression, error) {
-	precedence := p.currentPrecedence()
-	operator := p.currentToken.Literal
-	p.consumeToken()
-	right, err := p.parseExpression(precedence)
-	if err != nil {
-		return nil, err
-	}
-	return &ast.InfixExpression{Operator: operator, Left: left, Right: right}, nil
-}
-
 func (p *Parser) parseGroupedExpression() (ast.Expression, error) {
 	p.consumeToken()
 	expression, err := p.parseExpression(LOWEST)
@@ -241,9 +238,17 @@ func (p *Parser) parseGroupedExpression() (ast.Expression, error) {
 }
 
 func (p *Parser) parseFunctionLiteral() (ast.Expression, error) {
-	parameters, err := p.parseFunctionParameters()
+	expressions, err := p.parseCommaSeparatedExpressions(token.BAR)
 	if err != nil {
 		return nil, err
+	}
+	var parameters []*ast.Identifier
+	for _, expression := range expressions {
+		if parameter, ok := expression.(*ast.Identifier); ok {
+			parameters = append(parameters, parameter)
+		} else {
+			return nil, &ParserError{line: 1, msg: fmt.Sprintf("unable to parse function parameter: %+v", expression)}
+		}
 	}
 
 	if err := p.expectToken(token.LBRACE); err != nil {
@@ -257,33 +262,53 @@ func (p *Parser) parseFunctionLiteral() (ast.Expression, error) {
 	return &ast.FunctionLiteral{Parameters: parameters, Body: body}, nil
 }
 
-func (p *Parser) parseFunctionParameters() ([]*ast.Identifier, error) {
+func (p *Parser) parseInfixExpression(left ast.Expression) (*ast.InfixExpression, error) {
+	precedence := p.currentPrecedence()
+	operator := p.currentToken.Literal
 	p.consumeToken()
-	if p.currentToken.Type == token.BAR {
-		return []*ast.Identifier{}, nil
-	}
-
-	first, err := p.parseIdentifier()
+	right, err := p.parseExpression(precedence)
 	if err != nil {
 		return nil, err
 	}
-	parameters := []*ast.Identifier{first}
+	return &ast.InfixExpression{Operator: operator, Left: left, Right: right}, nil
+}
 
-	for p.peekToken.Type != token.BAR {
+func (p *Parser) parseFunctionCall(left ast.Expression) (*ast.FunctionCall, error) {
+	arguments, err := p.parseCommaSeparatedExpressions(token.RPAREN)
+	if err != nil {
+		return nil, err
+	}
+	return &ast.FunctionCall{Function: left, Arguments: arguments}, nil
+}
+
+func (p *Parser) parseCommaSeparatedExpressions(endTokenType token.Type) ([]ast.Expression, error) {
+	p.consumeToken()
+	if p.currentToken.Type == endTokenType {
+		return []ast.Expression{}, nil
+	}
+
+	first, err := p.parseExpression(LOWEST)
+	if err != nil {
+		return nil, err
+	}
+	expressions := []ast.Expression{first}
+
+	for p.peekToken.Type != endTokenType {
 		if err := p.expectToken(token.COMMA); err != nil {
 			return nil, err
 		}
 		p.consumeToken()
 
-		parameter, err := p.parseIdentifier()
+		expression, err := p.parseExpression(LOWEST)
 		if err != nil {
 			return nil, err
 		}
-		parameters = append(parameters, parameter)
+		expressions = append(expressions, expression)
 	}
-	if err := p.expectToken(token.BAR); err != nil {
+	if err := p.expectToken(endTokenType); err != nil {
 		return nil, err
 	}
 
-	return parameters, nil
+	return expressions, nil
 }
+
