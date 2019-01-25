@@ -4,9 +4,8 @@ import (
 	"github.com/muiscript/ether/token"
 )
 
-// TODO: implement arrow operator
 // TODO: implement array
-// TODO: implement builtin function
+// TODO: implement builtin function (map, reduce...)
 
 type Lexer struct {
 	input           string
@@ -54,6 +53,10 @@ func (l *Lexer) NextToken() token.Token {
 		tok = token.Token{Type: token.LBRACE, Literal: "{", Line: l.currentLine}
 	case '}':
 		tok = token.Token{Type: token.RBRACE, Literal: "}", Line: l.currentLine}
+	case '[':
+		tok = token.Token{Type: token.LBRACKET, Literal: "[", Line: l.currentLine}
+	case ']':
+		tok = token.Token{Type: token.RBRACKET, Literal: "]", Line: l.currentLine}
 	case '|':
 		tok = token.Token{Type: token.BAR, Literal: "|", Line: l.currentLine}
 	case ',':
