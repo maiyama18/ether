@@ -38,6 +38,20 @@ func TestLexer_NextToken(t *testing.T) {
 			},
 		},
 		{
+			desc:  "arrow operator",
+			input: "3 - 2 -> double()",
+			expectedTokens: []token.Token{
+				{Type: token.INTEGER, Literal: "3", Line: 1},
+				{Type: token.MINUS, Literal: "-", Line: 1},
+				{Type: token.INTEGER, Literal: "2", Line: 1},
+				{Type: token.ARROW, Literal: "->", Line: 1},
+				{Type: token.IDENT, Literal: "double", Line: 1},
+				{Type: token.LPAREN, Literal: "(", Line: 1},
+				{Type: token.RPAREN, Literal: ")", Line: 1},
+				{Type: token.EOF, Literal: "", Line: 1},
+			},
+		},
+		{
 			desc: "multiple-line input",
 			input: `=
 +-
@@ -86,7 +100,7 @@ return foo;`,
 			},
 		},
 		{
-			desc:  "comment",
+			desc: "comment",
 			input: `var foo = 42;
 # ignore me
 return foo; # this is comment`,

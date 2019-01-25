@@ -15,6 +15,8 @@ const (
 	ASTER  = "ASTER"
 	SLASH  = "SLASH"
 
+	ARROW = "ARROW"
+
 	COMMA     = "COMMA"
 	SEMICOLON = "SEMICOLON"
 

@@ -36,7 +36,12 @@ func (l *Lexer) NextToken() token.Token {
 	case '+':
 		tok = token.Token{Type: token.PLUS, Literal: "+", Line: l.currentLine}
 	case '-':
-		tok = token.Token{Type: token.MINUS, Literal: "-", Line: l.currentLine}
+		if l.peekChar() == '>' {
+			tok = token.Token{Type: token.ARROW, Literal: "->", Line: l.currentLine}
+			l.consumeChar()
+		} else {
+			tok = token.Token{Type: token.MINUS, Literal: "-", Line: l.currentLine}
+		}
 	case '*':
 		tok = token.Token{Type: token.ASTER, Literal: "*", Line: l.currentLine}
 	case '/':
