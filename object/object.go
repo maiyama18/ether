@@ -10,9 +10,10 @@ import (
 type Type string
 
 const (
-	INTEGER  = "INTEGER"
-	FUNCTION = "FUNCTION"
-	RETURN_VALUE = "RETURN_VALUE"
+	INTEGER          = "INTEGER"
+	FUNCTION         = "FUNCTION"
+	RETURN_VALUE     = "RETURN_VALUE"
+	BUILTIN_FUNCTION = "BUILTIN_FUNCTION"
 )
 
 type Object interface {
@@ -64,4 +65,16 @@ func (rv *ReturnValue) String() string {
 }
 func (rv *ReturnValue) Type() Type {
 	return RETURN_VALUE
+}
+
+type BuiltinFunction struct {
+	Fn func(args ...Object) Object
+}
+
+func (bf *BuiltinFunction) String() string {
+	var out bytes.Buffer
+	out.WriteString("Builtin")
+}
+func (bf *BuiltinFunction) Type() Type {
+	return BUILTIN_FUNCTION
 }
