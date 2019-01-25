@@ -174,6 +174,42 @@ func TestEval_FunctionCall(t *testing.T) {
 	}
 }
 
+func TestEval_ArrowExpression(t *testing.T) {
+	tests := []struct {
+		desc     string
+		input    string
+		expected interface{}
+	}{
+		{
+			desc:     "var identity=|x|{x;};42->identity();",
+			input:    "var identity = |x| { x; }; 42 -> identity();",
+			expected: 42,
+		},
+		{
+			desc:     "42->|x|{x;}();",
+			input:    "42 -> |x| { x; }();",
+			expected: 42,
+		},
+		{
+			desc:     "var add=|x,y|{x+y;};7->add(8);",
+			input:    "var add = |x, y| { x + y; }; 7 -> add(8);",
+			expected: 15,
+		},
+		{
+			desc:     "var add=|x,y|{x+y;};var double=|x|{2*x;};7->double()->add(1);",
+			input:    "var add = |x, y| { x + y; }; var double = |x| { 2 * x; }; 7 -> double() -> add(1);",
+			expected: 15,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			evaluated := eval(t, tt.input)
+			testObject(t, tt.expected, evaluated)
+		})
+	}
+}
+
 func TestEval_VarStatement(t *testing.T) {
 	tests := []struct {
 		desc     string
