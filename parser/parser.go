@@ -12,6 +12,7 @@ type Precedence int
 
 const (
 	LOWEST Precedence = iota
+	ARROW
 	ADDITION
 	MULTIPLICATION
 	PREFIX
@@ -20,6 +21,8 @@ const (
 
 func precedence(t token.Token) Precedence {
 	switch t.Type {
+	case token.ARROW:
+		return ARROW
 	case token.PLUS, token.MINUS:
 		return ADDITION
 	case token.ASTER, token.SLASH:
@@ -115,7 +118,7 @@ func (p *Parser) parseVarStatement() (*ast.VarStatement, error) {
 		return nil, err
 	}
 	if p.peekToken.Type == token.SEMICOLON {
-        p.consumeToken()
+		p.consumeToken()
 	}
 
 	return ast.NewVarStatement(identifier, expression, line), nil
@@ -192,6 +195,8 @@ func (p *Parser) parseExpression(precedence Precedence) (ast.Expression, error) 
 		switch p.currentToken.Type {
 		case token.LPAREN:
 			left, err = p.parseFunctionCall(left)
+		case token.ARROW:
+			left, err = p.parseArrowExpression(left)
 		default:
 			left, err = p.parseInfixExpression(left)
 		}
@@ -290,6 +295,22 @@ func (p *Parser) parseFunctionCall(left ast.Expression) (*ast.FunctionCall, erro
 	return ast.NewFunctionCall(left, arguments, line), nil
 }
 
+func (p *Parser) parseArrowExpression(left ast.Expression) (*ast.FunctionCall, error) {
+	line := p.currentToken.Line
+	p.consumeToken()
+	right, err := p.parseExpression(ARROW)
+	if err != nil {
+		return nil, err
+	}
+	rightCall, ok := right.(*ast.FunctionCall)
+	if !ok {
+		return nil, &ParserError{line: line, msg: fmt.Sprintf("right of '->' should be function call. got=%+v (%T)\n", right, right)}
+	}
+	rightCall.Arguments = append([]ast.Expression{left}, rightCall.Arguments...)
+
+	return rightCall, nil
+}
+
 func (p *Parser) parseCommaSeparatedExpressions(endTokenType token.Type) ([]ast.Expression, error) {
 	p.consumeToken()
 	if p.currentToken.Type == endTokenType {
@@ -320,4 +341,3 @@ func (p *Parser) parseCommaSeparatedExpressions(endTokenType token.Type) ([]ast.
 
 	return expressions, nil
 }
-

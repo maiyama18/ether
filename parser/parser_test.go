@@ -341,6 +341,55 @@ func TestParser_ParseProgram_FunctionCall(t *testing.T) {
 	}
 }
 
+func TestParser_ParseProgram_ArrowExpression(t *testing.T) {
+	tests := []struct {
+		desc         string
+		input        string
+		expectedName string
+		expectedArgs []interface{}
+	}{
+		{
+			desc:         "5->g();",
+			input:        "5 -> g();",
+			expectedName: "g",
+			expectedArgs: []interface{}{5},
+		},
+		{
+			desc:         "x->add(1);",
+			input:        "x -> add(1);",
+			expectedName: "add",
+			expectedArgs: []interface{}{"x", 1},
+		},
+		{
+			desc:         "2->|a,b|{a+b;}(3);",
+			input:        "2 -> |a, b| { a + b; }(3);",
+			expectedArgs: []interface{}{2, 3},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			program := parseProgram(t, tt.input)
+			expression := convertStatementsToSingleExpression(t, program.Statements)
+
+			functionCall, ok := expression.(*ast.FunctionCall)
+			if !ok {
+				t.Errorf("statement type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.FunctionCall{}, functionCall, functionCall)
+			}
+
+			if tt.expectedName != "" {
+				if actualName := functionCall.Function.(*ast.Identifier).Name; actualName != tt.expectedName {
+					t.Errorf("function name wrong.\nwant=%s\ngot=%s\n", tt.expectedName, actualName)
+				}
+			}
+			for i, expectedArg := range tt.expectedArgs {
+				actualArg := functionCall.Arguments[i]
+				testLiteral(t, expectedArg, actualArg)
+			}
+		})
+	}
+}
+
 func TestParser_ParseProgram_ComplexArithmetic(t *testing.T) {
 	tests := []struct {
 		desc     string
