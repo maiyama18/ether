@@ -16,9 +16,9 @@ type Identifier struct {
 }
 
 func NewIdentifier(name string, line int) *Identifier { return &Identifier{Name: name, line: line} }
-func (i *Identifier) Line() int { return i.line }
-func (i *Identifier) String() string  { return i.Name }
-func (i *Identifier) ExpressionNode() {}
+func (i *Identifier) Line() int                       { return i.line }
+func (i *Identifier) String() string                  { return i.Name }
+func (i *Identifier) ExpressionNode()                 {}
 
 type IntegerLiteral struct {
 	Value int
@@ -26,9 +26,9 @@ type IntegerLiteral struct {
 }
 
 func NewIntegerLiteral(value, line int) *IntegerLiteral { return &IntegerLiteral{Value: value, line: line} }
-func (il *IntegerLiteral) Line() int { return il.line }
-func (il *IntegerLiteral) String() string { return strconv.Itoa(il.Value) }
-func (il *IntegerLiteral) ExpressionNode() {}
+func (il *IntegerLiteral) Line() int                    { return il.line }
+func (il *IntegerLiteral) String() string               { return strconv.Itoa(il.Value) }
+func (il *IntegerLiteral) ExpressionNode()              {}
 
 type PrefixExpression struct {
 	Operator string
@@ -102,8 +102,8 @@ func (fc *FunctionCall) String() string {
 func (fc *FunctionCall) ExpressionNode() {}
 
 type ArrayLiteral struct {
-	Elements  []Expression // FunctionLiteral or Identifier
-	line      int
+	Elements []Expression
+	line     int
 }
 
 func NewArrayLiteral(elements []Expression, line int) *ArrayLiteral {
@@ -120,3 +120,19 @@ func (al *ArrayLiteral) String() string {
 	return "[" + strings.Join(elemStrs, ", ") + "]"
 }
 func (al *ArrayLiteral) ExpressionNode() {}
+
+type IndexExpression struct {
+	Array Expression
+	Index Expression
+	line  int
+}
+
+func NewIndexExpression(array Expression, index Expression, line int) *IndexExpression {
+	return &IndexExpression{Array: array, Index: index, line: line}
+}
+
+func (ie *IndexExpression) Line() int { return ie.line }
+func (ie *IndexExpression) String() string {
+	return ie.Array.String() + "[" + ie.Index.String() + "]"
+}
+func (ie *IndexExpression) ExpressionNode() {}

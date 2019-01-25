@@ -17,6 +17,7 @@ const (
 	MULTIPLICATION
 	PREFIX
 	CALL
+	INDEX
 )
 
 func precedence(t token.Token) Precedence {
@@ -28,7 +29,9 @@ func precedence(t token.Token) Precedence {
 	case token.ASTER, token.SLASH:
 		return MULTIPLICATION
 	case token.LPAREN:
-		return PREFIX
+		return CALL
+	case token.LBRACKET:
+		return INDEX
 	default:
 		return LOWEST
 	}
@@ -197,6 +200,8 @@ func (p *Parser) parseExpression(precedence Precedence) (ast.Expression, error) 
 		switch p.currentToken.Type {
 		case token.LPAREN:
 			left, err = p.parseFunctionCall(left)
+		case token.LBRACKET:
+			left, err = p.parseIndexExpression(left)
 		case token.ARROW:
 			left, err = p.parseArrowExpression(left)
 		default:
@@ -305,6 +310,19 @@ func (p *Parser) parseFunctionCall(left ast.Expression) (*ast.FunctionCall, erro
 		return nil, err
 	}
 	return ast.NewFunctionCall(left, arguments, line), nil
+}
+
+func (p *Parser) parseIndexExpression(left ast.Expression) (*ast.IndexExpression, error) {
+	line := p.currentToken.Line
+	p.consumeToken()
+	index, err := p.parseExpression(LOWEST)
+	if err != nil {
+		return nil, err
+	}
+	if err := p.expectToken(token.RBRACKET); err != nil {
+		return nil, err
+	}
+	return ast.NewIndexExpression(left, index, line), nil
 }
 
 func (p *Parser) parseArrowExpression(left ast.Expression) (*ast.FunctionCall, error) {

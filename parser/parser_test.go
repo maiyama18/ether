@@ -348,23 +348,23 @@ func TestParser_ParseProgram_ArrayLiteral(t *testing.T) {
 		expectedElements []interface{}
 	}{
 		{
-			desc:         "[]",
-			input:        "[];",
+			desc:             "[]",
+			input:            "[];",
 			expectedElements: []interface{}{},
 		},
 		{
-			desc:         "[1]",
-			input:        "[1];",
+			desc:             "[1]",
+			input:            "[1];",
 			expectedElements: []interface{}{1},
 		},
 		{
-			desc:         "[1,2,3]",
-			input:        "[1, 2, 3];",
+			desc:             "[1,2,3]",
+			input:            "[1, 2, 3];",
 			expectedElements: []interface{}{1, 2, 3},
 		},
 		{
-			desc:         "[x,y]",
-			input:        "[x, y];",
+			desc:             "[x,y]",
+			input:            "[x, y];",
 			expectedElements: []interface{}{"x", "y"},
 		},
 	}
@@ -383,6 +383,50 @@ func TestParser_ParseProgram_ArrayLiteral(t *testing.T) {
 				actualElem := arrayLiteral.Elements[i]
 				testLiteral(t, expectedElem, actualElem)
 			}
+		})
+	}
+}
+
+func TestParser_ParseProgram_IndexExpression(t *testing.T) {
+	tests := []struct {
+		desc          string
+		input         string
+		expectedArray string
+		expectedIndex interface{}
+	}{
+		{
+			desc:  "a[1]",
+			input: "a[1];",
+			expectedArray: "a",
+			expectedIndex: 1,
+		},
+		{
+			desc:  "a[b]",
+			input: "a[b];",
+			expectedArray: "a",
+			expectedIndex: "b",
+		},
+		{
+			desc:  "[0,1,2][1]",
+			input: "[0, 1, 2][1];",
+			expectedIndex: 1,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			program := parseProgram(t, tt.input)
+			expression := convertStatementsToSingleExpression(t, program.Statements)
+
+			indexExpression, ok := expression.(*ast.IndexExpression)
+			if !ok {
+				t.Errorf("statement type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.IndexExpression{}, indexExpression, indexExpression)
+			}
+
+			if tt.expectedArray != "" {
+				testLiteral(t, tt.expectedArray, indexExpression.Array)
+			}
+			testLiteral(t, tt.expectedIndex, indexExpression.Index)
 		})
 	}
 }
