@@ -183,6 +183,8 @@ func (p *Parser) parseExpression(precedence Precedence) (ast.Expression, error) 
 		left, err = p.parseGroupedExpression()
 	case token.BAR:
 		left, err = p.parseFunctionLiteral()
+	case token.LBRACKET:
+		left, err = p.parseArrayLiteral()
 	default:
 		return nil, &ParserError{line: p.currentToken.Line, msg: fmt.Sprintf("unable to parse prefix token %+v\n", p.currentToken)}
 	}
@@ -274,6 +276,16 @@ func (p *Parser) parseFunctionLiteral() (ast.Expression, error) {
 	return ast.NewFunctionLiteral(parameters, body, line), nil
 }
 
+func (p *Parser) parseArrayLiteral() (ast.Expression, error) {
+	line := p.currentToken.Line
+	elements, err := p.parseCommaSeparatedExpressions(token.RBRACKET)
+	if err != nil {
+		return nil, err
+	}
+
+	return ast.NewArrayLiteral(elements, line), nil
+}
+
 func (p *Parser) parseInfixExpression(left ast.Expression) (*ast.InfixExpression, error) {
 	line := p.currentToken.Line
 	precedence := p.currentPrecedence()
@@ -310,6 +322,7 @@ func (p *Parser) parseArrowExpression(left ast.Expression) (*ast.FunctionCall, e
 
 	return rightCall, nil
 }
+
 
 func (p *Parser) parseCommaSeparatedExpressions(endTokenType token.Type) ([]ast.Expression, error) {
 	p.consumeToken()

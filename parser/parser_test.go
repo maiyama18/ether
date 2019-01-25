@@ -341,6 +341,52 @@ func TestParser_ParseProgram_FunctionCall(t *testing.T) {
 	}
 }
 
+func TestParser_ParseProgram_ArrayLiteral(t *testing.T) {
+	tests := []struct {
+		desc             string
+		input            string
+		expectedElements []interface{}
+	}{
+		{
+			desc:         "[]",
+			input:        "[];",
+			expectedElements: []interface{}{},
+		},
+		{
+			desc:         "[1]",
+			input:        "[1];",
+			expectedElements: []interface{}{1},
+		},
+		{
+			desc:         "[1,2,3]",
+			input:        "[1, 2, 3];",
+			expectedElements: []interface{}{1, 2, 3},
+		},
+		{
+			desc:         "[x,y]",
+			input:        "[x, y];",
+			expectedElements: []interface{}{"x", "y"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			program := parseProgram(t, tt.input)
+			expression := convertStatementsToSingleExpression(t, program.Statements)
+
+			arrayLiteral, ok := expression.(*ast.ArrayLiteral)
+			if !ok {
+				t.Errorf("statement type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.ArrayLiteral{}, arrayLiteral, arrayLiteral)
+			}
+
+			for i, expectedElem := range tt.expectedElements {
+				actualElem := arrayLiteral.Elements[i]
+				testLiteral(t, expectedElem, actualElem)
+			}
+		})
+	}
+}
+
 func TestParser_ParseProgram_ArrowExpression(t *testing.T) {
 	tests := []struct {
 		desc         string

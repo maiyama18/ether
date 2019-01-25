@@ -1,7 +1,6 @@
 package ast
 
 import (
-	"bytes"
 	"strconv"
 	"strings"
 )
@@ -78,13 +77,7 @@ func (fl *FunctionLiteral) String() string {
 		paramStrs = append(paramStrs, param.String())
 	}
 
-	var out bytes.Buffer
-	out.WriteString("|")
-	out.WriteString(strings.Join(paramStrs, ", "))
-	out.WriteString("| ")
-	out.WriteString(fl.Body.String())
-
-	return out.String()
+	return "|" + strings.Join(paramStrs, ", ") + "| " + fl.Body.String()
 }
 func (fl *FunctionLiteral) ExpressionNode() {}
 
@@ -104,12 +97,26 @@ func (fc *FunctionCall) String() string {
 		argStrs = append(argStrs, arg.String())
 	}
 
-	var out bytes.Buffer
-	out.WriteString(fc.Function.String())
-	out.WriteString("(")
-	out.WriteString(strings.Join(argStrs, ", "))
-	out.WriteString(")")
-
-	return out.String()
+	return fc.Function.String() + "(" + strings.Join(argStrs, ", ") + ")"
 }
 func (fc *FunctionCall) ExpressionNode() {}
+
+type ArrayLiteral struct {
+	Elements  []Expression // FunctionLiteral or Identifier
+	line      int
+}
+
+func NewArrayLiteral(elements []Expression, line int) *ArrayLiteral {
+	return &ArrayLiteral{Elements: elements, line: line}
+}
+
+func (al *ArrayLiteral) Line() int { return al.line }
+func (al *ArrayLiteral) String() string {
+	var elemStrs []string
+	for _, elem := range al.Elements {
+		elemStrs = append(elemStrs, elem.String())
+	}
+
+	return "[" + strings.Join(elemStrs, ", ") + "]"
+}
+func (al *ArrayLiteral) ExpressionNode() {}
