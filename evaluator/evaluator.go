@@ -81,7 +81,11 @@ func evalExpression(expression ast.Expression, env *object.Environment) (object.
 	case *ast.Identifier:
 		value := env.Get(expression.Name)
 		if value == nil {
-			return nil, &EvalError{line: expression.Line(), msg: fmt.Sprintf("undefined identifier: %q", expression.Name)}
+			if builtin, ok := builtinFunctions[expression.Name]; ok {
+				return builtin, nil
+			} else {
+				return nil, &EvalError{line: expression.Line(), msg: fmt.Sprintf("undefined identifier: %q", expression.Name)}
+			}
 		}
 		return value, nil
 	case *ast.PrefixExpression:
@@ -154,19 +158,6 @@ func evalFunctionLiteral(functionLiteral *ast.FunctionLiteral, env *object.Envir
 }
 
 func evalFunctionCall(functionCall *ast.FunctionCall, env *object.Environment) (object.Object, error) {
-	functionExp, err := evalExpression(functionCall.Function, env)
-	if err != nil {
-		return nil, err
-	}
-	function, ok := functionExp.(*object.Function)
-	if !ok {
-		return nil, &EvalError{line: functionCall.Line(), msg: fmt.Sprintf("unable to convert to function: %+v (%T)", functionExp, functionExp)}
-	}
-
-	if len(functionCall.Arguments) != len(function.Parameters) {
-		return nil, &EvalError{line: functionCall.Arguments[0].Line(), msg: fmt.Sprintf("number of arguments for %+v wrong:\nwant=%d\ngot=%d\n", function, len(function.Parameters), len(functionCall.Arguments))}
-	}
-
 	var evaluatedArgs []object.Object
 	for _, arg := range functionCall.Arguments {
 		evaluatedArg, err := evalExpression(arg, env);
@@ -177,17 +168,34 @@ func evalFunctionCall(functionCall *ast.FunctionCall, env *object.Environment) (
 		evaluatedArgs = append(evaluatedArgs, evaluatedArg)
 	}
 
-	enclosedEnv := object.NewEnclosedEnvironment(function.Env)
-	for i, evaluatedArg := range evaluatedArgs {
-		ident := function.Parameters[i]
-		enclosedEnv.Set(ident.Name, evaluatedArg)
-	}
-
-	evaluated, err := Eval(function.Body, enclosedEnv)
+	function, err := evalExpression(functionCall.Function, env)
 	if err != nil {
 		return nil, err
 	}
-	return unwrapReturnValue(evaluated), nil
+
+	switch function := function.(type) {
+	case *object.Function:
+		if len(functionCall.Arguments) != len(function.Parameters) {
+			return nil, &EvalError{line: functionCall.Arguments[0].Line(), msg: fmt.Sprintf("number of arguments for %+v wrong:\nwant=%d\ngot=%d\n", function, len(function.Parameters), len(functionCall.Arguments))}
+		}
+
+		enclosedEnv := object.NewEnclosedEnvironment(function.Env)
+		for i, evaluatedArg := range evaluatedArgs {
+			ident := function.Parameters[i]
+			enclosedEnv.Set(ident.Name, evaluatedArg)
+		}
+
+		evaluated, err := Eval(function.Body, enclosedEnv)
+		if err != nil {
+			return nil, err
+		}
+		return unwrapReturnValue(evaluated), nil
+	case *object.BuiltinFunction:
+		return function.Fn(evaluatedArgs...), nil
+	default:
+		return nil, &EvalError{line: functionCall.Line(), msg: fmt.Sprintf("unable to convert to function: %+v (%T)", function, function)}
+	}
+
 }
 
 func unwrapReturnValue(obj object.Object) object.Object {

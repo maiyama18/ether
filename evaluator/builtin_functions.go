@@ -11,6 +11,7 @@ var builtinFunctions = map[string]*object.BuiltinFunction{
 			for _, arg := range args {
 				fmt.Println(arg)
 			}
+			return nil
 		},
 	},
 }

@@ -72,8 +72,7 @@ type BuiltinFunction struct {
 }
 
 func (bf *BuiltinFunction) String() string {
-	var out bytes.Buffer
-	out.WriteString("Builtin")
+	return "Builtin"
 }
 func (bf *BuiltinFunction) Type() Type {
 	return BUILTIN_FUNCTION
