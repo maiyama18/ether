@@ -11,6 +11,7 @@ type Type string
 
 const (
 	INTEGER          = "INTEGER"
+	ARRAY            = "ARRAY"
 	FUNCTION         = "FUNCTION"
 	RETURN_VALUE     = "RETURN_VALUE"
 	BUILTIN_FUNCTION = "BUILTIN_FUNCTION"
@@ -25,12 +26,22 @@ type Integer struct {
 	Value int
 }
 
-func (i *Integer) String() string {
-	return strconv.Itoa(i.Value)
+func (i *Integer) String() string { return strconv.Itoa(i.Value) }
+func (i *Integer) Type() Type     { return INTEGER }
+
+type Array struct {
+	Elements []Object
 }
-func (i *Integer) Type() Type {
-	return INTEGER
+
+func (a *Array) String() string {
+	var elemStrs []string
+	for _, elem := range a.Elements {
+		elemStrs = append(elemStrs, elem.String())
+	}
+
+	return "[" + strings.Join(elemStrs, ", ") + "]"
 }
+func (a *Array) Type() Type { return ARRAY }
 
 type Function struct {
 	Parameters []*ast.Identifier
@@ -52,28 +63,18 @@ func (f *Function) String() string {
 
 	return out.String()
 }
-func (f *Function) Type() Type {
-	return FUNCTION
-}
+func (f *Function) Type() Type { return FUNCTION }
 
 type ReturnValue struct {
 	Value Object
 }
 
-func (rv *ReturnValue) String() string {
-	return "Return<" + rv.Value.String() + ">"
-}
-func (rv *ReturnValue) Type() Type {
-	return RETURN_VALUE
-}
+func (rv *ReturnValue) String() string { return "Return<" + rv.Value.String() + ">" }
+func (rv *ReturnValue) Type() Type     { return RETURN_VALUE }
 
 type BuiltinFunction struct {
 	Fn func(args ...Object) Object
 }
 
-func (bf *BuiltinFunction) String() string {
-	return "Builtin"
-}
-func (bf *BuiltinFunction) Type() Type {
-	return BUILTIN_FUNCTION
-}
+func (bf *BuiltinFunction) String() string { return "Builtin" }
+func (bf *BuiltinFunction) Type() Type     { return BUILTIN_FUNCTION }
