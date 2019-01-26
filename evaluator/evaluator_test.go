@@ -210,6 +210,53 @@ func TestEval_ArrowExpression(t *testing.T) {
 	}
 }
 
+func TestEval_ArrayLiteral(t *testing.T) {
+	tests := []struct {
+		desc        string
+		input       string
+		expectedLen int
+		expected    []interface{}
+	}{
+		{
+			desc:     "[]",
+			input:    "[]",
+			expected: []interface{}{},
+		},
+		{
+			desc:     "[1]",
+			input:    "[1]",
+			expected: []interface{}{1},
+		},
+		{
+			desc:     "[1,2,3]",
+			input:    "[1, 2, 3]",
+			expected: []interface{}{1, 2, 3},
+		},
+		{
+			desc:     "var arr=[1,2,3];arr",
+			input:    "var arr = [1, 2, 3]; arr",
+			expected: []interface{}{1, 2, 3},
+		},
+
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			evaluated := eval(t, tt.input)
+			actual, ok := evaluated.(*object.Array)
+			if !ok {
+				t.Errorf("unable to convert to Array: %+v (%T)", evaluated, evaluated)
+			}
+			if len(actual.Elements) != len(tt.expected) {
+				t.Errorf("array length wrong.\nwant=%d\ngot=%d\n", len(tt.expected), len(actual.Elements))
+			}
+			for i, expected := range tt.expected {
+				testObject(t, expected, actual.Elements[i])
+			}
+		})
+	}
+}
+
 func TestEval_VarStatement(t *testing.T) {
 	tests := []struct {
 		desc     string

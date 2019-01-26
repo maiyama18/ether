@@ -88,6 +88,8 @@ func evalExpression(expression ast.Expression, env *object.Environment) (object.
 			}
 		}
 		return value, nil
+	case *ast.ArrayLiteral:
+		return evalArrayLiteral(expression, env)
 	case *ast.PrefixExpression:
 		return evalPrefixExpression(expression, env)
 	case *ast.InfixExpression:
@@ -195,7 +197,18 @@ func evalFunctionCall(functionCall *ast.FunctionCall, env *object.Environment) (
 	default:
 		return nil, &EvalError{line: functionCall.Line(), msg: fmt.Sprintf("unable to convert to function: %+v (%T)", function, function)}
 	}
+}
 
+func evalArrayLiteral(arrayLiteral *ast.ArrayLiteral, env *object.Environment) (object.Object, error) {
+	var evaluatedElements []object.Object
+	for _, elem := range arrayLiteral.Elements {
+		evaluatedElem, err := evalExpression(elem, env)
+		if err != nil {
+			return nil, err
+		}
+		evaluatedElements = append(evaluatedElements, evaluatedElem)
+	}
+	return &object.Array{Elements: evaluatedElements}, nil
 }
 
 func unwrapReturnValue(obj object.Object) object.Object {
