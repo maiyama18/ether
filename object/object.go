@@ -73,7 +73,7 @@ func (rv *ReturnValue) String() string { return "Return<" + rv.Value.String() + 
 func (rv *ReturnValue) Type() Type     { return RETURN_VALUE }
 
 type BuiltinFunction struct {
-	Fn func(args ...Object) Object
+	Fn func(args ...Object) (Object, error)
 }
 
 func (bf *BuiltinFunction) String() string { return "Builtin" }

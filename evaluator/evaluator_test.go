@@ -212,9 +212,9 @@ func TestEval_ArrowExpression(t *testing.T) {
 
 func TestEval_ArrayLiteral(t *testing.T) {
 	tests := []struct {
-		desc        string
-		input       string
-		expected    []interface{}
+		desc     string
+		input    string
+		expected []interface{}
 	}{
 		{
 			desc:     "[]",
@@ -236,7 +236,6 @@ func TestEval_ArrayLiteral(t *testing.T) {
 			input:    "var arr = [1, 2, 3]; arr",
 			expected: []interface{}{1, 2, 3},
 		},
-
 	}
 
 	for _, tt := range tests {
@@ -258,9 +257,9 @@ func TestEval_ArrayLiteral(t *testing.T) {
 
 func TestEval_IndexExpression(t *testing.T) {
 	tests := []struct {
-		desc        string
-		input       string
-		expected    interface{}
+		desc     string
+		input    string
+		expected interface{}
 	}{
 		{
 			desc:     "var a=[1];a[0]",
@@ -343,6 +342,42 @@ func TestEval_ReturnStatement(t *testing.T) {
 			desc:     "1; return 42; 1",
 			input:    "42;",
 			expected: 42,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			evaluated := eval(t, tt.input)
+			testObject(t, tt.expected, evaluated)
+		})
+	}
+}
+
+func TestEval_BuiltinFunction_Len(t *testing.T) {
+	tests := []struct {
+		desc     string
+		input    string
+		expected int
+	}{
+		{
+			desc:     "len([])",
+			input:    "len([])",
+			expected: 0,
+		},
+		{
+			desc:     "len([1])",
+			input:    "len([1])",
+			expected: 1,
+		},
+		{
+			desc:     "len([1,2,3])",
+			input:    "len([1, 2, 3])",
+			expected: 3,
+		},
+		{
+			desc:     "var a=[1,2,3];len(a)",
+			input:    "var a = [1, 2, 3]; len(a)",
+			expected: 3,
 		},
 	}
 

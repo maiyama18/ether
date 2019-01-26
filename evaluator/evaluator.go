@@ -195,7 +195,7 @@ func evalFunctionCall(functionCall *ast.FunctionCall, env *object.Environment) (
 		}
 		return unwrapReturnValue(evaluated), nil
 	case *object.BuiltinFunction:
-		return function.Fn(evaluatedArgs...), nil
+		return function.Fn(evaluatedArgs...)
 	default:
 		return nil, &EvalError{line: functionCall.Line(), msg: fmt.Sprintf("unable to convert to function: %+v (%T)", function, function)}
 	}
