@@ -88,8 +88,6 @@ func evalExpression(expression ast.Expression, env *object.Environment) (object.
 			}
 		}
 		return value, nil
-	case *ast.ArrayLiteral:
-		return evalArrayLiteral(expression, env)
 	case *ast.PrefixExpression:
 		return evalPrefixExpression(expression, env)
 	case *ast.InfixExpression:
@@ -98,6 +96,10 @@ func evalExpression(expression ast.Expression, env *object.Environment) (object.
 		return evalFunctionLiteral(expression, env)
 	case *ast.FunctionCall:
 		return evalFunctionCall(expression, env)
+	case *ast.ArrayLiteral:
+		return evalArrayLiteral(expression, env)
+	case *ast.IndexExpression:
+		return evalIndexExpression(expression, env)
 	default:
 		return nil, &EvalError{line: expression.Line(), msg: fmt.Sprintf("unable to eval expression: %+v (%T)", expression, expression)}
 	}
@@ -209,6 +211,32 @@ func evalArrayLiteral(arrayLiteral *ast.ArrayLiteral, env *object.Environment) (
 		evaluatedElements = append(evaluatedElements, evaluatedElem)
 	}
 	return &object.Array{Elements: evaluatedElements}, nil
+}
+
+func evalIndexExpression(indexExpression *ast.IndexExpression, env *object.Environment) (object.Object, error) {
+	evaluatedArray, err := evalExpression(indexExpression.Array, env)
+	if err != nil {
+		return nil, err
+	}
+	array, ok := evaluatedArray.(*object.Array)
+	if !ok {
+		return nil, &EvalError{line: indexExpression.Line(), msg: fmt.Sprintf("unable to convert to array: %+v (%T)", evaluatedArray, evaluatedArray)}
+	}
+
+	evaluatedIndex, err := evalExpression(indexExpression.Index, env)
+	if err != nil {
+		return nil, err
+	}
+	index, ok := evaluatedIndex.(*object.Integer)
+	if !ok {
+		return nil, &EvalError{line: indexExpression.Line(), msg: fmt.Sprintf("unable to convert to integer: %+v (%T)", evaluatedIndex, evaluatedIndex)}
+	}
+
+	if index.Value < 0 || len(array.Elements) <= index.Value {
+		return nil, &EvalError{line: indexExpression.Line(), msg: fmt.Sprintf("index out of range: %v[%d]\n", array, index.Value)}
+	}
+
+	return array.Elements[index.Value], nil
 }
 
 func unwrapReturnValue(obj object.Object) object.Object {

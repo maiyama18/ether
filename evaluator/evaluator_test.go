@@ -214,7 +214,6 @@ func TestEval_ArrayLiteral(t *testing.T) {
 	tests := []struct {
 		desc        string
 		input       string
-		expectedLen int
 		expected    []interface{}
 	}{
 		{
@@ -253,6 +252,42 @@ func TestEval_ArrayLiteral(t *testing.T) {
 			for i, expected := range tt.expected {
 				testObject(t, expected, actual.Elements[i])
 			}
+		})
+	}
+}
+
+func TestEval_IndexExpression(t *testing.T) {
+	tests := []struct {
+		desc        string
+		input       string
+		expected    interface{}
+	}{
+		{
+			desc:     "var a=[1];a[0]",
+			input:    "var a = [1]; a[0]",
+			expected: 1,
+		},
+		{
+			desc:     "var a=[1,2,3];a[2]",
+			input:    "var a = [1, 2, 3]; a[2]",
+			expected: 3,
+		},
+		{
+			desc:     "[1,2,3][2]",
+			input:    "[1, 2, 3][2]",
+			expected: 3,
+		},
+		{
+			desc:     "var i=2;[1,2,3][i]",
+			input:    "var i = 2; [1, 2, 3][i]",
+			expected: 3,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			evaluated := eval(t, tt.input)
+			testObject(t, tt.expected, evaluated)
 		})
 	}
 }
