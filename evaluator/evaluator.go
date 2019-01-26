@@ -6,6 +6,67 @@ import (
 	"github.com/muiscript/ether/object"
 )
 
+var builtinFunctions map[string]*object.BuiltinFunction
+
+func init() {
+	builtinFunctions = map[string]*object.BuiltinFunction{
+		"puts": {
+			Fn: func(args ...object.Object) (object.Object, error) {
+				for _, arg := range args {
+					fmt.Println(arg)
+				}
+				return nil, nil
+			},
+		},
+		"len": {
+			Fn: func(args ...object.Object) (object.Object, error) {
+				if len(args) != 1 {
+					return nil, &EvalError{line: 1, msg: fmt.Sprintf("number of arguments for len wrong: want=%d got=%d\n", 1, len(args))}
+				}
+				array, ok := args[0].(*object.Array)
+				if !ok {
+					return nil, &EvalError{line: 1, msg: fmt.Sprintf("argument type for len wrong: want=%T\ngot=%T\n", &object.Array{}, array)}
+				}
+
+				return &object.Integer{Value: len(array.Elements)}, nil
+			},
+		},
+		"map": {
+			Fn: func(args ...object.Object) (object.Object, error) {
+				if len(args) != 2 {
+					return nil, &EvalError{line: 1, msg: fmt.Sprintf("number of arguments for map wrong: want=%d got=%d\n", 2, len(args))}
+				}
+				array, ok := args[0].(*object.Array)
+				if !ok {
+					return nil, &EvalError{line: 1, msg: fmt.Sprintf("first argument type for map wrong: want=%T\ngot=%T\n", &object.Array{}, array)}
+				}
+				function, ok := args[1].(*object.Function)
+				if !ok {
+					return nil, &EvalError{line: 1, msg: fmt.Sprintf("second argument type for map wrong: want=%T\ngot=%T\n", &object.Function{}, function)}
+				}
+				if len(function.Parameters) != 1 {
+					return nil, &EvalError{line: 1, msg: fmt.Sprintf("number of parameters of map function wrong: want=%T\ngot=%T\n", 1, len(function.Parameters))}
+				}
+
+				var convertedElems []object.Object
+				for _, elem := range array.Elements {
+					enclosedEnv := object.NewEnclosedEnvironment(function.Env)
+					enclosedEnv.Set(function.Parameters[0].Name, elem)
+
+					evaluated, err := Eval(function.Body, enclosedEnv)
+					fmt.Println(evaluated)
+					if err != nil {
+						return nil, err
+					}
+					convertedElems = append(convertedElems, evaluated)
+				}
+
+				return &object.Array{Elements: convertedElems}, nil
+			},
+		},
+	}
+}
+
 func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 	switch node := node.(type) {
 	case *ast.Program:

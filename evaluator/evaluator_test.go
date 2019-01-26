@@ -1,6 +1,7 @@
 package evaluator
 
 import (
+	"fmt"
 	"github.com/muiscript/ether/lexer"
 	"github.com/muiscript/ether/object"
 	"github.com/muiscript/ether/parser"
@@ -357,7 +358,7 @@ func TestEval_BuiltinFunction_Len(t *testing.T) {
 	tests := []struct {
 		desc     string
 		input    string
-		expected int
+		expected interface{}
 	}{
 		{
 			desc:     "len([])",
@@ -385,6 +386,53 @@ func TestEval_BuiltinFunction_Len(t *testing.T) {
 		t.Run(tt.desc, func(t *testing.T) {
 			evaluated := eval(t, tt.input)
 			testObject(t, tt.expected, evaluated)
+		})
+	}
+}
+
+func TestEval_BuiltinFunction_Map(t *testing.T) {
+	tests := []struct {
+		desc     string
+		input    string
+		expected []interface{}
+	}{
+		{
+			desc:     "map([],|x|{2*x})",
+			input:    "map([], |x| { 2 * x })",
+			expected: []interface{}{},
+		},
+		{
+			desc:     "map([1],|x|{2*x})",
+			input:    "map([1], |x| { 2 * x })",
+			expected: []interface{}{2},
+		},
+		{
+			desc:     "map([1,2,3],|x|{2*x})",
+			input:    "map([1, 2, 3], |x| { 2 * x })",
+			expected: []interface{}{2, 4, 6},
+		},
+		{
+			desc:     "var a=[1,2,3];map(a,|x|{2*x})",
+			input:    "var a = [1, 2, 3]; map(a, |x| { 2 * x })",
+			expected: []interface{}{2, 4, 6},
+		},
+		{
+			desc:     "var double=|x| {2*x};map([1,2,3],double)",
+			input:    "var double = |x| { 2 * x }; map([1, 2, 3], double)",
+			expected: []interface{}{2, 4, 6},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			evaluated := eval(t, tt.input)
+			array, ok := evaluated.(*object.Array)
+			if !ok {
+				t.Errorf(fmt.Sprintf("not an array: %+v (%T)\n", evaluated, evaluated))
+			}
+			for i, expected := range tt.expected {
+				testObject(t, expected, array.Elements[i])
+			}
 		})
 	}
 }
