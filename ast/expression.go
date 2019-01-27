@@ -25,10 +25,24 @@ type IntegerLiteral struct {
 	line  int
 }
 
-func NewIntegerLiteral(value, line int) *IntegerLiteral { return &IntegerLiteral{Value: value, line: line} }
-func (il *IntegerLiteral) Line() int                    { return il.line }
-func (il *IntegerLiteral) String() string               { return strconv.Itoa(il.Value) }
-func (il *IntegerLiteral) ExpressionNode()              {}
+func NewIntegerLiteral(value, line int) *IntegerLiteral {
+	return &IntegerLiteral{Value: value, line: line}
+}
+func (il *IntegerLiteral) Line() int       { return il.line }
+func (il *IntegerLiteral) String() string  { return strconv.Itoa(il.Value) }
+func (il *IntegerLiteral) ExpressionNode() {}
+
+type BooleanLiteral struct {
+	Value bool
+	line  int
+}
+
+func NewBooleanLiteral(value bool, line int) *BooleanLiteral {
+	return &BooleanLiteral{Value: value, line: line}
+}
+func (bl *BooleanLiteral) Line() int       { return bl.line }
+func (bl *BooleanLiteral) String() string  { return strconv.FormatBool(bl.Value) }
+func (bl *BooleanLiteral) ExpressionNode() {}
 
 type PrefixExpression struct {
 	Operator string

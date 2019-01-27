@@ -147,6 +147,34 @@ func TestParser_ParseProgram_Identifier(t *testing.T) {
 	}
 }
 
+func TestParser_ParseProgram_Boolean(t *testing.T) {
+	tests := []struct {
+		desc     string
+		input    string
+		expected bool
+	}{
+		{
+			desc:     "true",
+			input:    "true;",
+			expected: true,
+		},
+		{
+			desc:     "false",
+			input:    "false;",
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			program := parseProgram(t, tt.input)
+			expression := convertStatementsToSingleExpression(t, program.Statements)
+
+			testLiteral(t, tt.expected, expression)
+		})
+	}
+}
+
 func TestParser_ParseProgram_PrefixExpression(t *testing.T) {
 	tests := []struct {
 		desc             string
@@ -395,20 +423,20 @@ func TestParser_ParseProgram_IndexExpression(t *testing.T) {
 		expectedIndex interface{}
 	}{
 		{
-			desc:  "a[1]",
-			input: "a[1];",
+			desc:          "a[1]",
+			input:         "a[1];",
 			expectedArray: "a",
 			expectedIndex: 1,
 		},
 		{
-			desc:  "a[b]",
-			input: "a[b];",
+			desc:          "a[b]",
+			input:         "a[b];",
 			expectedArray: "a",
 			expectedIndex: "b",
 		},
 		{
-			desc:  "[0,1,2][1]",
-			input: "[0, 1, 2][1];",
+			desc:          "[0,1,2][1]",
+			input:         "[0, 1, 2][1];",
 			expectedIndex: 1,
 		},
 	}
@@ -565,6 +593,14 @@ func testLiteral(t *testing.T, expected interface{}, expression ast.Expression) 
 		}
 		if expected != integerLiteral.Value {
 			t.Errorf("integer value wrong.\nwant=%+v\ngot=%+v\n", expected, integerLiteral.Value)
+		}
+	case bool:
+		booleanLiteral, ok := expression.(*ast.BooleanLiteral)
+		if !ok {
+			t.Errorf("expression type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.BooleanLiteral{}, booleanLiteral, booleanLiteral)
+		}
+		if expected != booleanLiteral.Value {
+			t.Errorf("boolean value wrong.\nwant=%+v\ngot=%+v\n", expected, booleanLiteral.Value)
 		}
 	case string:
 		identifier, ok := expression.(*ast.Identifier)

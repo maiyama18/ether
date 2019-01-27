@@ -20,6 +20,11 @@ const (
 	INDEX
 )
 
+var (
+	TRUE_NODE  = &ast.BooleanLiteral{Value: true}
+	FALSE_NODE = &ast.BooleanLiteral{Value: false}
+)
+
 func precedence(t token.Token) Precedence {
 	switch t.Type {
 	case token.ARROW:
@@ -178,6 +183,8 @@ func (p *Parser) parseExpression(precedence Precedence) (ast.Expression, error) 
 	switch p.currentToken.Type {
 	case token.INTEGER:
 		left, err = p.parseIntegerLiteral()
+	case token.TRUE, token.FALSE:
+		left, err = p.parseBooleanLiteral()
 	case token.IDENT:
 		left, err = p.parseIdentifier()
 	case token.MINUS:
@@ -222,6 +229,18 @@ func (p *Parser) parseIntegerLiteral() (*ast.IntegerLiteral, error) {
 		return nil, &ParserError{line: line, msg: err.Error()}
 	}
 	return ast.NewIntegerLiteral(v, line), nil
+}
+
+func (p *Parser) parseBooleanLiteral() (*ast.BooleanLiteral, error) {
+	line := p.currentToken.Line
+	switch p.currentToken.Type {
+	case token.TRUE:
+		return TRUE_NODE, nil
+	case token.FALSE:
+		return FALSE_NODE, nil
+	default:
+		return nil, &ParserError{line: line, msg: fmt.Sprintf("not boolean: %+v", p.currentToken)}
+	}
 }
 
 func (p *Parser) parseIdentifier() (*ast.Identifier, error) {
@@ -340,7 +359,6 @@ func (p *Parser) parseArrowExpression(left ast.Expression) (*ast.FunctionCall, e
 
 	return rightCall, nil
 }
-
 
 func (p *Parser) parseCommaSeparatedExpressions(endTokenType token.Type) ([]ast.Expression, error) {
 	p.consumeToken()
