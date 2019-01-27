@@ -54,7 +54,6 @@ func init() {
 					enclosedEnv.Set(function.Parameters[0].Name, elem)
 
 					evaluated, err := Eval(function.Body, enclosedEnv)
-					fmt.Println(evaluated)
 					if err != nil {
 						return nil, err
 					}

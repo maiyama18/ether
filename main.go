@@ -44,13 +44,12 @@ func interpret(filename string) int {
 	}
 
 	env := object.NewEnvironment()
-	result, err := evaluator.Eval(program, env)
+	_, err = evaluator.Eval(program, env)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 		return 3
 	}
 
-	fmt.Println(result)
 	return 0
 }
 
