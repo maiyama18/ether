@@ -20,16 +20,18 @@ const (
 	COMMA     = "COMMA"
 	SEMICOLON = "SEMICOLON"
 
-	LPAREN = "LPAREN"
-	RPAREN = "RPAREN"
-	LBRACE = "LBRACE"
-	RBRACE = "RBRACE"
+	LPAREN   = "LPAREN"
+	RPAREN   = "RPAREN"
+	LBRACE   = "LBRACE"
+	RBRACE   = "RBRACE"
 	LBRACKET = "LBRACKET"
 	RBRACKET = "RBRACKET"
-	BAR    = "BAR"
+	BAR      = "BAR"
 
 	VAR    = "VAR"
 	RETURN = "RETURN"
+	TRUE   = "TRUE"
+	FALSE  = "FALSE"
 )
 
 type Token struct {
@@ -44,6 +46,10 @@ func TypeByLiteral(literal string) Type {
 		return VAR
 	case "return":
 		return RETURN
+	case "true":
+		return TRUE
+	case "false":
+		return FALSE
 	default:
 		return IDENT
 	}

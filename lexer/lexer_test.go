@@ -70,6 +70,8 @@ func TestLexer_NextToken(t *testing.T) {
 		{
 			desc: "single-char keywords and literals",
 			input: `var a = 5;
+true;
+false;
 return a;`,
 			expectedTokens: []token.Token{
 				{Type: token.VAR, Literal: "var", Line: 1},
@@ -78,10 +80,16 @@ return a;`,
 				{Type: token.INTEGER, Literal: "5", Line: 1},
 				{Type: token.SEMICOLON, Literal: ";", Line: 1},
 
-				{Type: token.RETURN, Literal: "return", Line: 2},
-				{Type: token.IDENT, Literal: "a", Line: 2},
+				{Type: token.TRUE, Literal: "true", Line: 2},
 				{Type: token.SEMICOLON, Literal: ";", Line: 2},
-				{Type: token.EOF, Literal: "", Line: 2},
+
+				{Type: token.FALSE, Literal: "false", Line: 3},
+				{Type: token.SEMICOLON, Literal: ";", Line: 3},
+
+				{Type: token.RETURN, Literal: "return", Line: 4},
+				{Type: token.IDENT, Literal: "a", Line: 4},
+				{Type: token.SEMICOLON, Literal: ";", Line: 4},
+				{Type: token.EOF, Literal: "", Line: 4},
 			},
 		},
 		{
