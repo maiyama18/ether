@@ -12,7 +12,7 @@ func NewEnvironment() *Environment {
 func NewEnclosedEnvironment(outer *Environment) *Environment {
 	return &Environment{
 		objects: make(map[string]Object),
-		outer: outer,
+		outer:   outer,
 	}
 }
 

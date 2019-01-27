@@ -30,7 +30,7 @@ type ReturnStatement struct {
 func NewReturnStatement(expression Expression, line int) *ReturnStatement {
 	return &ReturnStatement{Expression: expression, line: line}
 }
-func (rs *ReturnStatement) Line() int { return rs.line }
+func (rs *ReturnStatement) Line() int      { return rs.line }
 func (rs *ReturnStatement) String() string { return "return " + rs.Expression.String() + ";" }
 func (rs *ReturnStatement) StatementNode() {}
 
@@ -42,7 +42,7 @@ type ExpressionStatement struct {
 func NewExpressionStatement(expression Expression, line int) *ExpressionStatement {
 	return &ExpressionStatement{Expression: expression, line: line}
 }
-func (es *ExpressionStatement) Line() int { return es.line }
+func (es *ExpressionStatement) Line() int      { return es.line }
 func (es *ExpressionStatement) String() string { return es.Expression.String() + ";" }
 func (es *ExpressionStatement) StatementNode() {}
 

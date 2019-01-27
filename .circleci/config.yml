@@ -1,0 +1,25 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.10
+
+    working_directory: /go/src/github.com/muiscript/ether
+    steps:
+      - checkout
+
+      - run:
+          name: go fmt
+          command: go fmt
+
+      - run:
+          name: go test
+          command: go test -v ./...
+
+      - run:
+          name: commit and push
+          command: |
+            git config user.name "circieci"
+            git add .
+            git commit --allow-empty -m "go fmt"
+            git push -q https://${GITHUB_TOKEN}@github.com/muiscript/ether.git master

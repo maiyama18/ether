@@ -52,4 +52,3 @@ func interpret(filename string) int {
 
 	return 0
 }
-

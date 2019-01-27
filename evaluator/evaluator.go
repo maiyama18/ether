@@ -224,7 +224,7 @@ func evalFunctionLiteral(functionLiteral *ast.FunctionLiteral, env *object.Envir
 func evalFunctionCall(functionCall *ast.FunctionCall, env *object.Environment) (object.Object, error) {
 	var evaluatedArgs []object.Object
 	for _, arg := range functionCall.Arguments {
-		evaluatedArg, err := evalExpression(arg, env);
+		evaluatedArg, err := evalExpression(arg, env)
 		if err != nil {
 			return nil, err
 		}
