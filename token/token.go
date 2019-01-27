@@ -6,20 +6,21 @@ const (
 	ILLEGAL = "ILLEGAL"
 	EOF     = "EOF"
 
+	// identifier and literal
 	IDENT   = "IDENT"
 	INTEGER = "INTEGER"
 
+	// operators
 	ASSIGN = "ASSIGN"
 	PLUS   = "PLUS"
 	MINUS  = "MINUS"
 	ASTER  = "ASTER"
 	SLASH  = "SLASH"
-
 	ARROW = "ARROW"
 
+	// delimiters
 	COMMA     = "COMMA"
 	SEMICOLON = "SEMICOLON"
-
 	LPAREN   = "LPAREN"
 	RPAREN   = "RPAREN"
 	LBRACE   = "LBRACE"
@@ -28,6 +29,7 @@ const (
 	RBRACKET = "RBRACKET"
 	BAR      = "BAR"
 
+	// keywords
 	VAR    = "VAR"
 	RETURN = "RETURN"
 	TRUE   = "TRUE"
