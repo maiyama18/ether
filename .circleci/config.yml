@@ -20,6 +20,7 @@ jobs:
           name: commit and push
           command: |
             git config user.name "circieci"
+            git config user.name "circieci@email.com"
             git add .
             git commit --allow-empty -m "go fmt"
             git push -q https://${GITHUB_TOKEN}@github.com/muiscript/ether.git master
