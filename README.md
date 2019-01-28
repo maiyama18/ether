@@ -11,7 +11,7 @@ A toy programming language, inspired by elixir, implemented in go.
 
 ## sample code
 
-```shell
+```ruby
 # function
 var double = |x| { x * 2 }
 puts(double(5)) # 10
