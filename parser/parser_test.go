@@ -255,6 +255,34 @@ func TestParser_ParseProgram_InfixExpression(t *testing.T) {
 			expectedLeft:     2,
 			expectedRight:    3,
 		},
+		{
+			desc:             "less than",
+			input:            "2 < 3;",
+			expectedOperator: "<",
+			expectedLeft:     2,
+			expectedRight:    3,
+		},
+		{
+			desc:             "greater than",
+			input:            "2 > 3;",
+			expectedOperator: ">",
+			expectedLeft:     2,
+			expectedRight:    3,
+		},
+		{
+			desc:             "equals",
+			input:            "2 == 3;",
+			expectedOperator: "==",
+			expectedLeft:     2,
+			expectedRight:    3,
+		},
+		{
+			desc:             "not equals",
+			input:            "2 != 3;",
+			expectedOperator: "!=",
+			expectedLeft:     2,
+			expectedRight:    3,
+		},
 	}
 
 	for _, tt := range tests {
@@ -280,18 +308,18 @@ func TestParser_ParseProgram_IfExpression(t *testing.T) {
 		expectedAlternative  interface{}
 	}{
 		{
-			desc:  "if(true){10;}",
-			input: "if (true) { 10; }",
+			desc:                 "if(true){10;}",
+			input:                "if (true) { 10; }",
 			expectedConditionStr: "true",
-			expectedConsequence: 10,
-			expectedAlternative: nil,
+			expectedConsequence:  10,
+			expectedAlternative:  nil,
 		},
 		{
-			desc:  "if(!false){10;}",
-			input: "if (!false) { 10; } else { 9; }",
+			desc:                 "if(!false){10;}",
+			input:                "if (!false) { 10; } else { 9; }",
 			expectedConditionStr: "(!false)",
-			expectedConsequence: 10,
-			expectedAlternative: 9,
+			expectedConsequence:  10,
+			expectedAlternative:  9,
 		},
 	}
 

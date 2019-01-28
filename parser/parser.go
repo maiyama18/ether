@@ -12,6 +12,8 @@ type Precedence int
 
 const (
 	LOWEST Precedence = iota
+	EQUAL
+	COMPARISON
 	ARROW
 	ADDITION
 	MULTIPLICATION
@@ -29,6 +31,10 @@ func precedence(t token.Token) Precedence {
 	switch t.Type {
 	case token.ARROW:
 		return ARROW
+	case token.EQ, token.NEQ:
+		return EQUAL
+	case token.GT, token.LT:
+		return COMPARISON
 	case token.PLUS, token.MINUS:
 		return ADDITION
 	case token.ASTER, token.SLASH:
