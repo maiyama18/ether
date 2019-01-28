@@ -7,7 +7,7 @@ A toy programming language, inspired by elixir, implemented in go.
 ## language features
 
 - ether has `integer`, `boolean`, `array`, and `function` as literals
-- One of the most (or maybe, only) notable feature of ether is arrow operator `->`. It works like [Elixir's pipe operator](https://elixir-lang.org/getting-started/enumerables-and-streams.html#the-pipe-operator), which makes successive data transformations readable.
+- One of the most (or maybe, only) notable feature of ether is arrow operator `->`. It works like [Elixir's pipe operator](https://elixir-lang.org/getting-started/enumerables-and-streams.html#the-pipe-operator), which makes successive data transformations readable
 
 ## sample code
 
