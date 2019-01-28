@@ -193,6 +193,8 @@ func (p *Parser) parseExpression(precedence Precedence) (ast.Expression, error) 
 		left, err = p.parseGroupedExpression()
 	case token.BAR:
 		left, err = p.parseFunctionLiteral()
+	case token.IF:
+		left, err = p.parseIfExpression()
 	case token.LBRACKET:
 		left, err = p.parseArrayLiteral()
 	default:
@@ -272,6 +274,41 @@ func (p *Parser) parseGroupedExpression() (ast.Expression, error) {
 		return nil, err
 	}
 	return expression, nil
+}
+
+func (p *Parser) parseIfExpression() (ast.Expression, error) {
+	line := p.currentToken.Line
+
+	if err := p.expectToken(token.LPAREN); err != nil {
+		return nil, err
+	}
+	p.consumeToken()
+	condition, err := p.parseExpression(LOWEST)
+	if err != nil {
+		return nil, err
+	}
+	if err := p.expectToken(token.RPAREN); err != nil {
+		return nil, err
+	}
+
+	if err := p.expectToken(token.LBRACE); err != nil {
+		return nil, err
+	}
+	consequence, err := p.parseBlockStatement()
+	if err != nil {
+		return nil, err
+	}
+
+	if p.peekToken.Type != token.ELSE {
+		return ast.NewIfExpression(condition, consequence, nil, line), nil
+	}
+	p.consumeToken()
+	p.consumeToken()
+	alternative, err := p.parseBlockStatement()
+	if err != nil {
+		return nil, err
+	}
+	return ast.NewIfExpression(condition, consequence, alternative, line), nil
 }
 
 func (p *Parser) parseFunctionLiteral() (ast.Expression, error) {

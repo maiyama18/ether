@@ -282,27 +282,16 @@ func TestParser_ParseProgram_IfExpression(t *testing.T) {
 		{
 			desc:  "if(true){10;}",
 			input: "if (true) { 10; }",
+			expectedConditionStr: "true",
+			expectedConsequence: 10,
+			expectedAlternative: nil,
 		},
 		{
-			desc:             "subtraction",
-			input:            "2 - 3;",
-			expectedOperator: "-",
-			expectedLeft:     2,
-			expectedRight:    3,
-		},
-		{
-			desc:             "multiplication",
-			input:            "2 * 3;",
-			expectedOperator: "*",
-			expectedLeft:     2,
-			expectedRight:    3,
-		},
-		{
-			desc:             "division",
-			input:            "2 / 3;",
-			expectedOperator: "/",
-			expectedLeft:     2,
-			expectedRight:    3,
+			desc:  "if(!false){10;}",
+			input: "if (!false) { 10; } else { 9; }",
+			expectedConditionStr: "(!false)",
+			expectedConsequence: 10,
+			expectedAlternative: 9,
 		},
 	}
 
@@ -311,11 +300,23 @@ func TestParser_ParseProgram_IfExpression(t *testing.T) {
 			program := parseProgram(t, tt.input)
 			expression := convertStatementsToSingleExpression(t, program.Statements)
 
-			infixExpression, ok := expression.(*ast.InfixExpression)
+			ifExpression, ok := expression.(*ast.IfExpression)
 			if !ok {
-				t.Errorf("statement type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.InfixExpression{}, infixExpression, infixExpression)
+				t.Errorf("statement type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.IfExpression{}, ifExpression, ifExpression)
 			}
-			testInfixExpression(t, tt.expectedOperator, tt.expectedLeft, tt.expectedRight, infixExpression)
+			if ifExpression.Condition.String() != tt.expectedConditionStr {
+				t.Errorf("condition string wrong\nwant=%s\ngot=%s\n", tt.expectedConditionStr, ifExpression.Condition.String())
+			}
+			consequence := convertStatementsToSingleExpression(t, ifExpression.Consequence.Statements)
+			testLiteral(t, tt.expectedConsequence, consequence)
+			if tt.expectedAlternative == nil {
+				if ifExpression.Alternative != nil {
+					t.Errorf("nil expected for alternative but got: %+v (%T)\n", ifExpression.Alternative, ifExpression.Alternative)
+				}
+			} else {
+				alternative := convertStatementsToSingleExpression(t, ifExpression.Alternative.Statements)
+				testLiteral(t, tt.expectedAlternative, alternative)
+			}
 		})
 	}
 }
@@ -664,6 +665,10 @@ func testLiteral(t *testing.T, expected interface{}, expression ast.Expression) 
 		}
 		if expected != identifier.Name {
 			t.Errorf("identifier name wrong.\nwant=%+v\ngot=%+v\n", expected, identifier.Name)
+		}
+	case nil:
+		if expression != nil {
+			t.Errorf("expression type wrong.\nwant=%T\ngot=%T (%v)\n", nil, expression, expression)
 		}
 	}
 }
