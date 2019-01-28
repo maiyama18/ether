@@ -2,7 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/muiscript/ether.svg?style=svg)](https://circleci.com/gh/muiscript/ether)
 
-A toy programming language, inspired by elixir, implemented in go.
+A toy programming language implemented in go.
 
 ## language features
 
