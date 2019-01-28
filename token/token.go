@@ -35,6 +35,8 @@ const (
 	RETURN = "RETURN"
 	TRUE   = "TRUE"
 	FALSE  = "FALSE"
+	IF     = "IF"
+	ELSE   = "ELSE"
 )
 
 type Token struct {
@@ -53,6 +55,10 @@ func TypeByLiteral(literal string) Type {
 		return TRUE
 	case "false":
 		return FALSE
+	case "if":
+		return IF
+	case "else":
+		return ELSE
 	default:
 		return IDENT
 	}

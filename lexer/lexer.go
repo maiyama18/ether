@@ -4,8 +4,7 @@ import (
 	"github.com/muiscript/ether/token"
 )
 
-// TODO: implement array
-// TODO: implement builtin function (map, reduce...)
+// TODO: implement builtin function (filter, reduce...)
 
 type Lexer struct {
 	input           string
