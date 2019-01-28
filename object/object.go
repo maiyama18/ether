@@ -16,6 +16,7 @@ const (
 	FUNCTION         = "FUNCTION"
 	RETURN_VALUE     = "RETURN_VALUE"
 	BUILTIN_FUNCTION = "BUILTIN_FUNCTION"
+	NULL = "NULL"
 )
 
 type Object interface {
@@ -86,3 +87,8 @@ type BuiltinFunction struct {
 
 func (bf *BuiltinFunction) String() string { return "Builtin" }
 func (bf *BuiltinFunction) Type() Type     { return BUILTIN_FUNCTION }
+
+type Null struct {}
+
+func (n *Null) String() string { return "null" }
+func (n *Null) Type() Type     { return NULL }

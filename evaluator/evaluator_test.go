@@ -175,6 +175,47 @@ func TestEval_Function(t *testing.T) {
 	}
 }
 
+func TestEval_IfExpression(t *testing.T) {
+	tests := []struct {
+		desc     string
+		input    string
+		expected interface{}
+	}{
+		{
+			desc:     "if(true){10;}",
+			input:    "if (true) { 10; }",
+			expected: 10,
+		},
+		{
+			desc:     "if(true){10;}else{9;}",
+			input:    "if (true) { 10; } else { 9; }",
+			expected: 10,
+		},
+		{
+			desc:     "if(false){10;}else{9;}",
+			input:    "if (false) { 10; } else { 9; }",
+			expected: 9,
+		},
+		{
+			desc:     "if(!true){10;}else{9;}",
+			input:    "if (!true) { 10; } else { 9; }",
+			expected: 9,
+		},
+		{
+			desc:     "if(false){10;}",
+			input:    "if (false) { 10; }",
+			expected: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			evaluated := eval(t, tt.input)
+			testObject(t, tt.expected, evaluated)
+		})
+	}
+}
+
 func TestEval_FunctionCall(t *testing.T) {
 	tests := []struct {
 		desc     string
@@ -528,6 +569,11 @@ func testObject(t *testing.T, expectedValue interface{}, actual object.Object) {
 		}
 		if boolean.Value != expectedValue {
 			t.Errorf("boolean value wrong:\nwant=%v\ngot=%v\n", expectedValue, boolean.Value)
+		}
+	case nil:
+		_, ok := actual.(*object.Null)
+		if !ok {
+			t.Fatalf("unable to convert to null: %+v\n", actual)
 		}
 	default:
 		t.Errorf("unexpected type: %T", expectedValue)

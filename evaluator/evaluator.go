@@ -9,6 +9,7 @@ import (
 var (
 	TRUE_OBJ  = &object.Boolean{Value: true}
 	FALSE_OBJ = &object.Boolean{Value: false}
+	NULL_OBJ  = &object.Null{}
 )
 
 var builtinFunctions map[string]*object.BuiltinFunction
@@ -163,6 +164,8 @@ func evalExpression(expression ast.Expression, env *object.Environment) (object.
 		return evalPrefixExpression(expression, env)
 	case *ast.InfixExpression:
 		return evalInfixExpression(expression, env)
+	case *ast.IfExpression:
+		return evalIfExpression(expression, env)
 	case *ast.FunctionLiteral:
 		return evalFunctionLiteral(expression, env)
 	case *ast.FunctionCall:
@@ -238,6 +241,29 @@ func evalInfixExpression(infixExpression *ast.InfixExpression, env *object.Envir
 		}
 	default:
 		return nil, &EvalError{line: infixExpression.Line(), msg: fmt.Sprintf("invalid type for infix expression: %+v (%T)", left, left)}
+	}
+}
+
+func evalIfExpression(ifExpression *ast.IfExpression, env *object.Environment) (object.Object, error) {
+	condition, err := evalExpression(ifExpression.Condition, env)
+	if err != nil {
+		return nil, err
+	}
+	if condition == FALSE_OBJ || condition == NULL_OBJ {
+		if ifExpression.Alternative == nil {
+			return NULL_OBJ, nil
+		}
+		alternative, err := Eval(ifExpression.Alternative, env)
+		if err != nil {
+			return nil, err
+		}
+		return alternative, nil
+	} else {
+		consequence, err := Eval(ifExpression.Consequence, env)
+		if err != nil {
+			return nil, err
+		}
+		return consequence, nil
 	}
 }
 
