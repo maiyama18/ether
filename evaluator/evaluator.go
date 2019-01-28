@@ -138,6 +138,8 @@ func evalExpression(expression ast.Expression, env *object.Environment) (object.
 	switch expression := expression.(type) {
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: expression.Value}, nil
+	case *ast.BooleanLiteral:
+		return &object.Boolean{Value: expression.Value}, nil
 	case *ast.Identifier:
 		value := env.Get(expression.Name)
 		if value == nil {

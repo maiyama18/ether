@@ -69,6 +69,32 @@ func TestEval_Integer(t *testing.T) {
 	}
 }
 
+func TestEval_Boolean(t *testing.T) {
+	tests := []struct {
+		desc     string
+		input    string
+		expected bool
+	}{
+		{
+			desc:     "true",
+			input:    "true;",
+			expected: true,
+		},
+		{
+			desc:     "false",
+			input:    "false;",
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			evaluated := eval(t, tt.input)
+			testObject(t, tt.expected, evaluated)
+		})
+	}
+}
+
 // since the parse of function literal is tested in parser package,
 // here we only test whether...
 // - the function literal is evaluated as function object
@@ -464,6 +490,14 @@ func testObject(t *testing.T, expectedValue interface{}, actual object.Object) {
 		}
 		if integer.Value != expectedValue {
 			t.Errorf("integer value wrong:\nwant=%d\ngot=%d\n", expectedValue, integer.Value)
+		}
+	case bool:
+		boolean, ok := actual.(*object.Boolean)
+		if !ok {
+			t.Fatalf("unable to convert to boolean: %+v\n", actual)
+		}
+		if boolean.Value != expectedValue {
+			t.Errorf("boolean value wrong:\nwant=%v\ngot=%v\n", expectedValue, boolean.Value)
 		}
 	default:
 		t.Errorf("unexpected type: %T", expectedValue)

@@ -11,6 +11,7 @@ type Type string
 
 const (
 	INTEGER          = "INTEGER"
+	BOOLEAN          = "BOOLEAN"
 	ARRAY            = "ARRAY"
 	FUNCTION         = "FUNCTION"
 	RETURN_VALUE     = "RETURN_VALUE"
@@ -28,6 +29,13 @@ type Integer struct {
 
 func (i *Integer) String() string { return strconv.Itoa(i.Value) }
 func (i *Integer) Type() Type     { return INTEGER }
+
+type Boolean struct {
+	Value bool
+}
+
+func (b *Boolean) String() string { return strconv.FormatBool(b.Value) }
+func (b *Boolean) Type() Type     { return BOOLEAN }
 
 type Array struct {
 	Elements []Object
