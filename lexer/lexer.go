@@ -45,6 +45,8 @@ func (l *Lexer) NextToken() token.Token {
 		tok = token.Token{Type: token.ASTER, Literal: "*", Line: l.currentLine}
 	case '/':
 		tok = token.Token{Type: token.SLASH, Literal: "/", Line: l.currentLine}
+	case '!':
+		tok = token.Token{Type: token.BANG, Literal: "!", Line: l.currentLine}
 	case '(':
 		tok = token.Token{Type: token.LPAREN, Literal: "(", Line: l.currentLine}
 	case ')':

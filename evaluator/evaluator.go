@@ -178,8 +178,17 @@ func evalPrefixExpression(prefixExpression *ast.PrefixExpression, env *object.En
 		switch prefixExpression.Operator {
 		case "-":
 			return &object.Integer{Value: -right.Value}, nil
+		case "!":
+			return &object.Boolean{Value: false}, nil
 		default:
 			return nil, &EvalError{line: prefixExpression.Line(), msg: fmt.Sprintf("unknown prefix operator for integer: %q", prefixExpression.Operator)}
+		}
+	case *object.Boolean:
+		switch prefixExpression.Operator {
+		case "!":
+			return &object.Boolean{Value: !right.Value}, nil
+		default:
+			return nil, &EvalError{line: prefixExpression.Line(), msg: fmt.Sprintf("unknown prefix operator for boolean: %q", prefixExpression.Operator)}
 		}
 	default:
 		return nil, &EvalError{line: prefixExpression.Right.Line(), msg: fmt.Sprintf("invalid type for prefix expression: %+v (%T)", right, right)}

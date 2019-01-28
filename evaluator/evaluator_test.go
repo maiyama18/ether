@@ -85,6 +85,36 @@ func TestEval_Boolean(t *testing.T) {
 			input:    "false;",
 			expected: false,
 		},
+		{
+			desc:     "!true",
+			input:    "!true;",
+			expected: false,
+		},
+		{
+			desc:     "!false",
+			input:    "!false;",
+			expected: true,
+		},
+		{
+			desc:     "!!true",
+			input:    "!!true;",
+			expected: true,
+		},
+		{
+			desc:     "!!false",
+			input:    "!!false;",
+			expected: false,
+		},
+		{
+			desc:     "!42",
+			input:    "!42;",
+			expected: false,
+		},
+		{
+			desc:     "!!42",
+			input:    "!!42;",
+			expected: true,
+		},
 	}
 
 	for _, tt := range tests {

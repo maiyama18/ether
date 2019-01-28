@@ -17,6 +17,7 @@ const (
 	ASTER  = "ASTER"
 	SLASH  = "SLASH"
 	ARROW  = "ARROW"
+	BANG   = "BANG"
 
 	// delimiters
 	COMMA     = "COMMA"

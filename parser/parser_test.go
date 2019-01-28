@@ -180,7 +180,7 @@ func TestParser_ParseProgram_PrefixExpression(t *testing.T) {
 		desc             string
 		input            string
 		expectedOperator string
-		expectedRight    int
+		expectedRight    interface{}
 	}{
 		{
 			desc:             "-5",
@@ -193,6 +193,12 @@ func TestParser_ParseProgram_PrefixExpression(t *testing.T) {
 			input:            "-42;",
 			expectedOperator: "-",
 			expectedRight:    42,
+		},
+		{
+			desc:             "!true",
+			input:            "!true;",
+			expectedOperator: "!",
+			expectedRight:    true,
 		},
 	}
 

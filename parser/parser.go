@@ -187,7 +187,7 @@ func (p *Parser) parseExpression(precedence Precedence) (ast.Expression, error) 
 		left, err = p.parseBooleanLiteral()
 	case token.IDENT:
 		left, err = p.parseIdentifier()
-	case token.MINUS:
+	case token.MINUS, token.BANG:
 		left, err = p.parsePrefixExpression()
 	case token.LPAREN:
 		left, err = p.parseGroupedExpression()
