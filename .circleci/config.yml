@@ -10,17 +10,8 @@ jobs:
 
       - run:
           name: go fmt
-          command: go fmt
+          command: test -z "$(gofmt -s -l . | tee /dev/stderr)"
 
       - run:
           name: go test
           command: go test -v ./...
-
-      - run:
-          name: commit and push
-          command: |
-            git config user.name "circieci"
-            git config user.email "circieci@email.com"
-            git add .
-            git commit --allow-empty -m "go fmt"
-            git push -q https://${GITHUB_TOKEN}@github.com/muiscript/ether.git master
