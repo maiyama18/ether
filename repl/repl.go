@@ -40,6 +40,8 @@ func Start() {
 			continue
 		}
 
-		fmt.Println(evaluated)
+		if evaluated != nil {
+			fmt.Println(evaluated)
+		}
 	}
 }
