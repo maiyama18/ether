@@ -115,6 +115,41 @@ func TestEval_Boolean(t *testing.T) {
 			input:    "!!42;",
 			expected: true,
 		},
+		{
+			desc:     "1<2",
+			input:    "1 < 2;",
+			expected: true,
+		},
+		{
+			desc:     "2<1",
+			input:    "2 < 1;",
+			expected: false,
+		},
+		{
+			desc:     "2>1",
+			input:    "2 > 1;",
+			expected: true,
+		},
+		{
+			desc:     "1==1",
+			input:    "1 == 1;",
+			expected: true,
+		},
+		{
+			desc:     "2==1",
+			input:    "2 == 1;",
+			expected: false,
+		},
+		{
+			desc:     "2!=1",
+			input:    "2 != 1;",
+			expected: true,
+		},
+		{
+			desc:     "1!=1",
+			input:    "1 != 1;",
+			expected: false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -205,6 +240,11 @@ func TestEval_IfExpression(t *testing.T) {
 			desc:     "if(false){10;}",
 			input:    "if (false) { 10; }",
 			expected: nil,
+		},
+		{
+			desc:     "if(2>1){10;}",
+			input:    "if (2 > 1) { 10; }",
+			expected: 10,
 		},
 	}
 
