@@ -6,6 +6,11 @@ import (
 	"github.com/muiscript/ether/object"
 )
 
+var (
+	TRUE_OBJ  = &object.Boolean{Value: true}
+	FALSE_OBJ = &object.Boolean{Value: false}
+)
+
 var builtinFunctions map[string]*object.BuiltinFunction
 
 func init() {
@@ -139,7 +144,11 @@ func evalExpression(expression ast.Expression, env *object.Environment) (object.
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: expression.Value}, nil
 	case *ast.BooleanLiteral:
-		return &object.Boolean{Value: expression.Value}, nil
+		if expression.Value {
+			return TRUE_OBJ, nil
+		} else {
+			return FALSE_OBJ, nil
+		}
 	case *ast.Identifier:
 		value := env.Get(expression.Name)
 		if value == nil {
@@ -179,14 +188,18 @@ func evalPrefixExpression(prefixExpression *ast.PrefixExpression, env *object.En
 		case "-":
 			return &object.Integer{Value: -right.Value}, nil
 		case "!":
-			return &object.Boolean{Value: false}, nil
+			return FALSE_OBJ, nil
 		default:
 			return nil, &EvalError{line: prefixExpression.Line(), msg: fmt.Sprintf("unknown prefix operator for integer: %q", prefixExpression.Operator)}
 		}
 	case *object.Boolean:
 		switch prefixExpression.Operator {
 		case "!":
-			return &object.Boolean{Value: !right.Value}, nil
+			if right == TRUE_OBJ {
+				return FALSE_OBJ, nil
+			} else {
+				return TRUE_OBJ, nil
+			}
 		default:
 			return nil, &EvalError{line: prefixExpression.Line(), msg: fmt.Sprintf("unknown prefix operator for boolean: %q", prefixExpression.Operator)}
 		}
