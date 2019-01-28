@@ -49,6 +49,8 @@ func (l *Lexer) NextToken() token.Token {
 		tok = token.Token{Type: token.ASTER, Literal: "*", Line: l.currentLine}
 	case '/':
 		tok = token.Token{Type: token.SLASH, Literal: "/", Line: l.currentLine}
+	case '%':
+		tok = token.Token{Type: token.PERCENT, Literal: "%", Line: l.currentLine}
 	case '!':
 		if l.peekChar() == '=' {
 			tok = token.Token{Type: token.NEQ, Literal: "!=", Line: l.currentLine}
