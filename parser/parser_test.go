@@ -256,6 +256,13 @@ func TestParser_ParseProgram_InfixExpression(t *testing.T) {
 			expectedRight:    3,
 		},
 		{
+			desc:             "modulo",
+			input:            "2 % 3;",
+			expectedOperator: "%",
+			expectedLeft:     2,
+			expectedRight:    3,
+		},
+		{
 			desc:             "less than",
 			input:            "2 < 3;",
 			expectedOperator: "<",

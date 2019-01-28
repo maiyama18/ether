@@ -270,6 +270,8 @@ func evalInfixExpression(infixExpression *ast.InfixExpression, env *object.Envir
 			return &object.Integer{Value: left.Value * right.Value}, nil
 		case "/":
 			return &object.Integer{Value: left.Value / right.Value}, nil
+		case "%":
+			return &object.Integer{Value: left.Value % right.Value}, nil
 		case ">":
 			if left.Value > right.Value {
 				return TRUE_OBJ, nil
@@ -296,6 +298,24 @@ func evalInfixExpression(infixExpression *ast.InfixExpression, env *object.Envir
 			}
 		default:
 			return nil, &EvalError{line: infixExpression.Line(), msg: fmt.Sprintf("unknown infix operator for integer: %q", infixExpression.Operator)}
+		}
+	case *object.Boolean:
+		right := right.(*object.Boolean)
+		switch infixExpression.Operator {
+		case "==":
+			if left == right {
+				return TRUE_OBJ, nil
+			} else {
+				return FALSE_OBJ, nil
+			}
+		case "!=":
+			if left != right {
+				return TRUE_OBJ, nil
+			} else {
+				return FALSE_OBJ, nil
+			}
+		default:
+			return nil, &EvalError{line: infixExpression.Line(), msg: fmt.Sprintf("unknown infix operator for boolean: %q", infixExpression.Operator)}
 		}
 	default:
 		return nil, &EvalError{line: infixExpression.Line(), msg: fmt.Sprintf("invalid type for infix expression: %+v (%T)", left, left)}

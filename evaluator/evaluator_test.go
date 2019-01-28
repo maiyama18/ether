@@ -59,6 +59,16 @@ func TestEval_Integer(t *testing.T) {
 			input:    "(1 + 2) * 3;",
 			expected: 9,
 		},
+		{
+			desc:     "15 % 3",
+			input:    "15 % 3;",
+			expected: 0,
+		},
+		{
+			desc:     "14 % 3",
+			input:    "14 % 3;",
+			expected: 2,
+		},
 	}
 
 	for _, tt := range tests {
@@ -148,6 +158,26 @@ func TestEval_Boolean(t *testing.T) {
 		{
 			desc:     "1!=1",
 			input:    "1 != 1;",
+			expected: false,
+		},
+		{
+			desc:     "true==true",
+			input:    "true == true;",
+			expected: true,
+		},
+		{
+			desc:     "true==false",
+			input:    "true == false;",
+			expected: false,
+		},
+		{
+			desc:     "true!=false",
+			input:    "true != false;",
+			expected: true,
+		},
+		{
+			desc:     "true!=true",
+			input:    "true != true;",
 			expected: false,
 		},
 	}

@@ -37,7 +37,7 @@ func precedence(t token.Token) Precedence {
 		return COMPARISON
 	case token.PLUS, token.MINUS:
 		return ADDITION
-	case token.ASTER, token.SLASH:
+	case token.ASTER, token.SLASH, token.PERCENT:
 		return MULTIPLICATION
 	case token.LPAREN:
 		return CALL
