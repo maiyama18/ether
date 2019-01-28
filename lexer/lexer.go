@@ -30,7 +30,12 @@ func (l *Lexer) NextToken() token.Token {
 		l.ignoreComment()
 		return l.NextToken()
 	case '=':
-		tok = token.Token{Type: token.ASSIGN, Literal: "=", Line: l.currentLine}
+		if l.peekChar() == '=' {
+			tok = token.Token{Type: token.EQ, Literal: "==", Line: l.currentLine}
+			l.consumeChar()
+		} else {
+			tok = token.Token{Type: token.ASSIGN, Literal: "=", Line: l.currentLine}
+		}
 	case '+':
 		tok = token.Token{Type: token.PLUS, Literal: "+", Line: l.currentLine}
 	case '-':
@@ -45,7 +50,16 @@ func (l *Lexer) NextToken() token.Token {
 	case '/':
 		tok = token.Token{Type: token.SLASH, Literal: "/", Line: l.currentLine}
 	case '!':
-		tok = token.Token{Type: token.BANG, Literal: "!", Line: l.currentLine}
+		if l.peekChar() == '=' {
+			tok = token.Token{Type: token.NEQ, Literal: "!=", Line: l.currentLine}
+			l.consumeChar()
+		} else {
+			tok = token.Token{Type: token.BANG, Literal: "!", Line: l.currentLine}
+		}
+	case '<':
+		tok = token.Token{Type: token.LT, Literal: "<", Line: l.currentLine}
+	case '>':
+		tok = token.Token{Type: token.GT, Literal: ">", Line: l.currentLine}
 	case '(':
 		tok = token.Token{Type: token.LPAREN, Literal: "(", Line: l.currentLine}
 	case ')':

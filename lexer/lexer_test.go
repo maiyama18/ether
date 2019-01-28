@@ -20,7 +20,7 @@ func TestLexer_NextToken(t *testing.T) {
 		},
 		{
 			desc:  "single-char operators",
-			input: "=+-*/!(){}[]|,;",
+			input: "=+-*/!<>(){}[]|,;",
 			expectedTokens: []token.Token{
 				{Type: token.ASSIGN, Literal: "=", Line: 1},
 				{Type: token.PLUS, Literal: "+", Line: 1},
@@ -28,6 +28,8 @@ func TestLexer_NextToken(t *testing.T) {
 				{Type: token.ASTER, Literal: "*", Line: 1},
 				{Type: token.SLASH, Literal: "/", Line: 1},
 				{Type: token.BANG, Literal: "!", Line: 1},
+				{Type: token.LT, Literal: "<", Line: 1},
+				{Type: token.GT, Literal: ">", Line: 1},
 				{Type: token.LPAREN, Literal: "(", Line: 1},
 				{Type: token.RPAREN, Literal: ")", Line: 1},
 				{Type: token.LBRACE, Literal: "{", Line: 1},
@@ -37,6 +39,15 @@ func TestLexer_NextToken(t *testing.T) {
 				{Type: token.BAR, Literal: "|", Line: 1},
 				{Type: token.COMMA, Literal: ",", Line: 1},
 				{Type: token.SEMICOLON, Literal: ";", Line: 1},
+				{Type: token.EOF, Literal: "", Line: 1},
+			},
+		},
+		{
+			desc:  "multi-char operators",
+			input: "== !=",
+			expectedTokens: []token.Token{
+				{Type: token.EQ, Literal: "==", Line: 1},
+				{Type: token.NEQ, Literal: "!=", Line: 1},
 				{Type: token.EOF, Literal: "", Line: 1},
 			},
 		},

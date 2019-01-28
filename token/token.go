@@ -18,6 +18,10 @@ const (
 	SLASH  = "SLASH"
 	ARROW  = "ARROW"
 	BANG   = "BANG"
+	LT     = "LT"
+	GT     = "GT"
+	EQ     = "EQ"
+	NEQ    = "NEQ"
 
 	// delimiters
 	COMMA     = "COMMA"
