@@ -150,3 +150,24 @@ func (ie *IndexExpression) String() string {
 	return ie.Array.String() + "[" + ie.Index.String() + "]"
 }
 func (ie *IndexExpression) ExpressionNode() {}
+
+type IfExpression struct {
+	Condition   Expression
+	Consequence *BlockStatement
+	Alternative *BlockStatement
+	line        int
+}
+
+func NewIfExpression(condition Expression, consequence *BlockStatement, alternative *BlockStatement, line int) *IfExpression {
+	return &IfExpression{Condition: condition, Consequence: consequence, Alternative: alternative, line: line}
+}
+
+func (ie *IfExpression) Line() int { return ie.line }
+func (ie *IfExpression) String() string {
+	str := "if (" + ie.Condition.String() + ") " + ie.Consequence.String()
+	if ie.Alternative == nil {
+		return str
+	}
+	return str + " else " + ie.Alternative.String()
+}
+func (ie *IfExpression) ExpressionNode() {}

@@ -271,6 +271,55 @@ func TestParser_ParseProgram_InfixExpression(t *testing.T) {
 	}
 }
 
+func TestParser_ParseProgram_IfExpression(t *testing.T) {
+	tests := []struct {
+		desc                 string
+		input                string
+		expectedConditionStr string
+		expectedConsequence  interface{}
+		expectedAlternative  interface{}
+	}{
+		{
+			desc:  "if(true){10;}",
+			input: "if (true) { 10; }",
+		},
+		{
+			desc:             "subtraction",
+			input:            "2 - 3;",
+			expectedOperator: "-",
+			expectedLeft:     2,
+			expectedRight:    3,
+		},
+		{
+			desc:             "multiplication",
+			input:            "2 * 3;",
+			expectedOperator: "*",
+			expectedLeft:     2,
+			expectedRight:    3,
+		},
+		{
+			desc:             "division",
+			input:            "2 / 3;",
+			expectedOperator: "/",
+			expectedLeft:     2,
+			expectedRight:    3,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			program := parseProgram(t, tt.input)
+			expression := convertStatementsToSingleExpression(t, program.Statements)
+
+			infixExpression, ok := expression.(*ast.InfixExpression)
+			if !ok {
+				t.Errorf("statement type wrong.\nwant=%T\ngot=%T (%v)\n", &ast.InfixExpression{}, infixExpression, infixExpression)
+			}
+			testInfixExpression(t, tt.expectedOperator, tt.expectedLeft, tt.expectedRight, infixExpression)
+		})
+	}
+}
+
 func TestParser_ParseProgram_FunctionLiteral(t *testing.T) {
 	tests := []struct {
 		desc                string
