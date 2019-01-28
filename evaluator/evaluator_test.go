@@ -604,6 +604,42 @@ func TestEval_BuiltinFunction_Map(t *testing.T) {
 	}
 }
 
+func TestEval_BuiltinFunction_Reduce(t *testing.T) {
+	tests := []struct {
+		desc     string
+		input    string
+		expected interface{}
+	}{
+		{
+			desc:     "reduce([],0,|acc,x|{acc+x})",
+			input:    "reduce([], 0, |acc, x| { acc + x })",
+			expected: 0,
+		},
+		{
+			desc:     "reduce([1,2,3,4],0,|acc,x|{acc+x})",
+			input:    "reduce([1,2,3,4], 0, |acc, x| { acc + x })",
+			expected: 10,
+		},
+		{
+			desc:     "reduce([1,2,3,4],1,|acc,x|{acc*x})",
+			input:    "reduce([1,2,3,4], 1, |acc, x| { acc * x })",
+			expected: 24,
+		},
+		{
+			desc:     "reduce([true,true,true],true,|acc,x|{acc==x})",
+			input:    "reduce([true, true, true], true, |acc, x| { acc == x })",
+			expected: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			evaluated := eval(t, tt.input)
+			testObject(t, tt.expected, evaluated)
+		})
+	}
+}
+
 func TestEval_BuiltinFunction_Filter(t *testing.T) {
 	tests := []struct {
 		desc     string

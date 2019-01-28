@@ -103,6 +103,43 @@ func init() {
 				return &object.Array{Elements: filteredElems}, nil
 			},
 		},
+		"reduce": {
+			Fn: func(args ...object.Object) (object.Object, error) {
+				if len(args) != 3 {
+					return nil, &EvalError{line: 1, msg: fmt.Sprintf("number of arguments for reduce wrong: want=%d got=%d\n", 3, len(args))}
+				}
+
+				array, ok := args[0].(*object.Array)
+				if !ok {
+					return nil, &EvalError{line: 1, msg: fmt.Sprintf("first argument type for reduce wrong: want=%T\ngot=%T\n", &object.Array{}, array)}
+				}
+
+				initValue := args[1]
+
+				function, ok := args[2].(*object.Function)
+				if !ok {
+					return nil, &EvalError{line: 1, msg: fmt.Sprintf("second argument type for reduce wrong: want=%T\ngot=%T\n", &object.Function{}, function)}
+				}
+				if len(function.Parameters) != 2 {
+					return nil, &EvalError{line: 1, msg: fmt.Sprintf("number of parameters of reduce function wrong: want=%T\ngot=%T\n", 2, len(function.Parameters))}
+				}
+
+				var accumulated = initValue
+				for _, elem := range array.Elements {
+					enclosedEnv := object.NewEnclosedEnvironment(function.Env)
+					enclosedEnv.Set(function.Parameters[0].Name, accumulated)
+					enclosedEnv.Set(function.Parameters[1].Name, elem)
+
+					evaluated, err := Eval(function.Body, enclosedEnv)
+					if err != nil {
+						return nil, err
+					}
+					accumulated = evaluated
+				}
+
+				return accumulated, nil
+			},
+		},
 	}
 }
 
