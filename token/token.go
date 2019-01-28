@@ -16,18 +16,18 @@ const (
 	MINUS  = "MINUS"
 	ASTER  = "ASTER"
 	SLASH  = "SLASH"
-	ARROW = "ARROW"
+	ARROW  = "ARROW"
 
 	// delimiters
 	COMMA     = "COMMA"
 	SEMICOLON = "SEMICOLON"
-	LPAREN   = "LPAREN"
-	RPAREN   = "RPAREN"
-	LBRACE   = "LBRACE"
-	RBRACE   = "RBRACE"
-	LBRACKET = "LBRACKET"
-	RBRACKET = "RBRACKET"
-	BAR      = "BAR"
+	LPAREN    = "LPAREN"
+	RPAREN    = "RPAREN"
+	LBRACE    = "LBRACE"
+	RBRACE    = "RBRACE"
+	LBRACKET  = "LBRACKET"
+	RBRACKET  = "RBRACKET"
+	BAR       = "BAR"
 
 	// keywords
 	VAR    = "VAR"
