@@ -69,6 +69,40 @@ func init() {
 				return &object.Array{Elements: convertedElems}, nil
 			},
 		},
+		"filter": {
+			Fn: func(args ...object.Object) (object.Object, error) {
+				if len(args) != 2 {
+					return nil, &EvalError{line: 1, msg: fmt.Sprintf("number of arguments for filter wrong: want=%d got=%d\n", 2, len(args))}
+				}
+				array, ok := args[0].(*object.Array)
+				if !ok {
+					return nil, &EvalError{line: 1, msg: fmt.Sprintf("first argument type for filter wrong: want=%T\ngot=%T\n", &object.Array{}, array)}
+				}
+				function, ok := args[1].(*object.Function)
+				if !ok {
+					return nil, &EvalError{line: 1, msg: fmt.Sprintf("second argument type for filter wrong: want=%T\ngot=%T\n", &object.Function{}, function)}
+				}
+				if len(function.Parameters) != 1 {
+					return nil, &EvalError{line: 1, msg: fmt.Sprintf("number of parameters of filter function wrong: want=%T\ngot=%T\n", 1, len(function.Parameters))}
+				}
+
+				var filteredElems []object.Object
+				for _, elem := range array.Elements {
+					enclosedEnv := object.NewEnclosedEnvironment(function.Env)
+					enclosedEnv.Set(function.Parameters[0].Name, elem)
+
+					evaluated, err := Eval(function.Body, enclosedEnv)
+					if err != nil {
+						return nil, err
+					}
+					if evaluated != NULL_OBJ && evaluated != FALSE_OBJ {
+						filteredElems = append(filteredElems, elem)
+					}
+				}
+
+				return &object.Array{Elements: filteredElems}, nil
+			},
+		},
 	}
 }
 

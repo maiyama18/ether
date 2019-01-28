@@ -574,6 +574,53 @@ func TestEval_BuiltinFunction_Map(t *testing.T) {
 	}
 }
 
+func TestEval_BuiltinFunction_Filter(t *testing.T) {
+	tests := []struct {
+		desc     string
+		input    string
+		expected []interface{}
+	}{
+		{
+			desc:     "filter([],|x|{true})",
+			input:    "filter([], |x| { true })",
+			expected: []interface{}{},
+		},
+		{
+			desc:     "filter([],|x|{false})",
+			input:    "filter([], |x| { false })",
+			expected: []interface{}{},
+		},
+		{
+			desc:     "filter([1,2,3],|x|{true})",
+			input:    "filter([1, 2, 3], |x| { true })",
+			expected: []interface{}{1, 2, 3},
+		},
+		{
+			desc:     "filter([1,2,3],|x|{false})",
+			input:    "filter([1, 2, 3], |x| { false })",
+			expected: []interface{}{},
+		},
+		{
+			desc:     "filter([1,2,3,4,5],|x|{x>3})",
+			input:    "filter([1, 2, 3, 4, 5], |x| { x > 3 })",
+			expected: []interface{}{4, 5},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			evaluated := eval(t, tt.input)
+			array, ok := evaluated.(*object.Array)
+			if !ok {
+				t.Errorf(fmt.Sprintf("not an array: %+v (%T)\n", evaluated, evaluated))
+			}
+			for i, expected := range tt.expected {
+				testObject(t, expected, array.Elements[i])
+			}
+		})
+	}
+}
+
 func eval(t *testing.T, input string) object.Object {
 	l := lexer.New(input)
 	p := parser.New(l)
